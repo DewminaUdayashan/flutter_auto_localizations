@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:yaml/yaml.dart';
 
 class ConfigParser {
-  static const String yamlConfigPath = "translation_config.yaml";
-  static const String jsonConfigPath = "translation_config.json";
+  static Map<String, dynamic> loadConfig({String? customPath}) {
+    final String yamlConfigPath = customPath ?? "translation_config.yaml";
+    final String jsonConfigPath = customPath ?? "translation_config.json";
 
-  static Map<String, dynamic> loadConfig() {
     File? configFile;
 
     if (File(yamlConfigPath).existsSync()) {
@@ -18,7 +18,7 @@ class ConfigParser {
       print("✅ Using JSON configuration: $jsonConfigPath");
     } else {
       throw Exception(
-          "❌ No configuration file found. Please create 'translation_config.yaml' or 'translation_config.json'.");
+          "❌ No configuration file found at $yamlConfigPath or $jsonConfigPath.");
     }
 
     final content = configFile.readAsStringSync();

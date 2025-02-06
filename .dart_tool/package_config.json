@@ -38,6 +38,30 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "build",
+      "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/build-2.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "built_collection",
+      "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/built_collection-5.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "built_value",
+      "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/built_value-8.9.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "code_builder",
+      "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/code_builder-4.10.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "collection",
       "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/collection-1.19.1",
       "packageUri": "lib/",
@@ -62,6 +86,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "dart_style",
+      "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/dart_style-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "dotenv",
       "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/dotenv-4.2.0",
       "packageUri": "lib/",
@@ -72,6 +102,12 @@
       "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/file-7.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "fixnum",
+      "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/fixnum-1.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
     },
     {
       "name": "frontend_server_client",
@@ -152,6 +188,12 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "mockito",
+      "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/mockito-5.4.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
       "name": "node_preamble",
       "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/node_preamble-2.0.2",
       "packageUri": "lib/",
@@ -204,6 +246,12 @@
       "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/shelf_web_socket-2.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "source_gen",
+      "rootUri": "file:///Users/dewminaudayashan/.pub-cache/hosted/pub.dev/source_gen-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
     },
     {
       "name": "source_map_stack_trace",
@@ -320,7 +368,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-02-06T16:33:36.932985Z",
+  "generated": "2025-02-06T17:20:07.947733Z",
   "generator": "pub",
   "generatorVersion": "3.6.1",
   "flutterRoot": "file:///Users/dewminaudayashan/development/flutter",
