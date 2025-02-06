@@ -7,7 +7,10 @@ void main() async {
   const localizationDir = "lib/l10n/";
 
   try {
-    final env = DotEnv(includePlatformEnvironment: true)..load();
+    final rootDir = Directory.current.path;
+
+    final env = DotEnv(includePlatformEnvironment: true)
+      ..load(['$rootDir/.env']);
 
     final config = ConfigParser.loadConfig();
     final defaultLang = config["default"];
