@@ -1,11 +1,14 @@
 import 'dart:io';
 
+import 'package:dotenv/dotenv.dart';
 import 'package:flutter_auto_localizations/flutter_auto_localizations.dart';
 
 void main() async {
   const localizationDir = "lib/l10n/";
 
   try {
+    final env = DotEnv(includePlatformEnvironment: true)..load();
+
     final config = ConfigParser.loadConfig();
     final defaultLang = config["default"];
     final targetLanguages = List<String>.from(config["languages"]);
@@ -15,7 +18,8 @@ void main() async {
     final arbFile = "$localizationDir/app_$defaultLang.arb";
     final data = FileManager.readArbFile(arbFile);
 
-    final apiKey = Platform.environment['GOOGLE_TRANSLATE_API_KEY'];
+    final apiKey = env['GOOGLE_TRANSLATE_API_KEY'];
+
     if (apiKey == null) {
       print("❌ Missing GOOGLE_TRANSLATE_API_KEY environment variable.");
       exit(1);
