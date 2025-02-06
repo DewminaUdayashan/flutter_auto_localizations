@@ -3,11 +3,10 @@ import 'dart:io';
 import 'package:flutter_auto_localizations/flutter_auto_localizations.dart';
 
 void main() async {
-  const configPath = "translation_config.json";
   const localizationDir = "lib/l10n/";
 
   try {
-    final config = ConfigParser.loadConfig(configPath);
+    final config = ConfigParser.loadConfig();
     final defaultLang = config["default"];
     final targetLanguages = List<String>.from(config["languages"]);
 
