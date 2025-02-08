@@ -96,6 +96,12 @@ void main() {
       expect(result, contains("Flutter")); // Flutter should remain unchanged
     });
 
+    test('Ensures entire ignored word remains unchanged', () async {
+      final result = await mockTranslator.translateText(
+          'onlyIgnoredWord', 'Flutter', 'en', 'es');
+      expect(result, equals("Flutter")); // Should NOT be translated
+    });
+
     test('Handles errors gracefully when empty text is given', () async {
       try {
         await mockTranslator.translateText('randomKey', '', 'en', 'es');
