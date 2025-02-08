@@ -16,8 +16,7 @@ void main() async {
         config.containsKey("run_pub_get") ? config["run_pub_get"] : true;
 
     final globalIgnorePhrases = List<String>.from(config["ignore_phrases"]);
-    final keyConfig = Map<String, dynamic>.from(
-        config["key_config"]); // Load per-key ignore settings
+    final keyConfig = Map<String, dynamic>.from(config["key_config"]);
 
     final arbFile = "$localizationDir/app_$defaultLang.arb";
     final data = FileManager.readArbFile(arbFile);
@@ -42,9 +41,8 @@ void main() async {
       int currentProgress = 0;
 
       for (final key in data.keys) {
-        if (key.startsWith('@')) continue; // Skip metadata keys
+        if (key.startsWith('@')) continue;
 
-        // Show progress
         currentProgress++;
         stdout.write("\r📌 Progress: $currentProgress / $totalEntries");
 
@@ -53,7 +51,8 @@ void main() async {
       }
 
       final newFile = "$localizationDir/app_$lang.arb";
-      FileManager.writeArbFile(newFile, newData);
+      FileManager.writeArbFile(
+          newFile, newData, lang); // ✅ Pass target locale for @@locale update
       print("\n✅ Translated file saved: $newFile");
     }
 

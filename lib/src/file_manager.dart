@@ -10,8 +10,15 @@ class FileManager {
     return json.decode(file.readAsStringSync());
   }
 
-  static void writeArbFile(String path, Map<String, dynamic> data) {
+  static void writeArbFile(
+      String path, Map<String, dynamic> data, String targetLocale) {
     final file = File(path);
+
+    // ✅ Update @@locale to match the target language code
+    if (data.containsKey("@@locale")) {
+      data["@@locale"] = targetLocale;
+    }
+
     file.writeAsStringSync(JsonEncoder.withIndent('  ').convert(data));
   }
 }
