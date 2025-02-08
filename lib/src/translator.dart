@@ -13,7 +13,7 @@ class Translator {
   Future<String> translateText(
       String key, String text, String fromLang, String toLang) async {
     if (text.isEmpty) {
-      throw Exception("Invalid text");
+      throw Exception("❌ Error: Cannot translate empty text.");
     }
 
     // Check if key has `skipIgnorePhrases` enabled
@@ -29,9 +29,8 @@ class Translator {
       ignorePhrases = List<String>.from(keyConfig[key]['ignore_phrases']);
     }
 
-    // ✅ NEW FIX: If the entire text matches an ignored phrase, return as-is.
+    // ✅ If the entire text matches an ignored phrase, return as-is.
     if (ignorePhrases.contains(text)) {
-      print("🔹 Skipping translation for exact match: $text");
       return text;
     }
 
@@ -77,7 +76,7 @@ class Translator {
       final decoded = json.decode(response.body);
       return decoded["data"]["translations"][0]["translatedText"];
     } else {
-      throw Exception("Translation failed: ${response.body}");
+      throw Exception("❌ Translation failed: ${response.body}");
     }
   }
 }
