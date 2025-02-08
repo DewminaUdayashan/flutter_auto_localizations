@@ -8,12 +8,15 @@ void main() async {
 
   try {
     final env = DotEnv(includePlatformEnvironment: true)..load();
-
     final config = ConfigParser.loadConfig();
+
     final defaultLang = config["default"];
     final targetLanguages = List<String>.from(config["languages"]);
     final shouldRunPubGet =
         config.containsKey("run_pub_get") ? config["run_pub_get"] : true;
+
+    final ignorePhrases =
+        List<String>.from(config["ignore_phrases"]); // Load ignore phrases
 
     final arbFile = "$localizationDir/app_$defaultLang.arb";
     final data = FileManager.readArbFile(arbFile);
@@ -26,7 +29,7 @@ void main() async {
       exit(1);
     }
 
-    final translator = Translator(apiKey);
+    final translator = Translator(apiKey, ignorePhrases: ignorePhrases);
 
     for (final lang in targetLanguages) {
       print("\n🌍 Translating to $lang...");
@@ -37,9 +40,8 @@ void main() async {
       int currentProgress = 0;
 
       for (final key in data.keys) {
-        if (key.startsWith('@')) continue; // Skip metadata keys
+        if (key.startsWith('@')) continue;
 
-        // Show progress
         currentProgress++;
         stdout.write("\r📌 Progress: $currentProgress / $totalEntries");
 

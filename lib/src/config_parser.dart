@@ -22,11 +22,21 @@ class ConfigParser {
     }
 
     final content = configFile.readAsStringSync();
+    Map<String, dynamic> config;
+
     if (configFile.path.endsWith(".yaml") || configFile.path.endsWith(".yml")) {
-      return json.decode(
+      config = json.decode(
           json.encode(loadYaml(content))); // Convert YAML to JSON format
     } else {
-      return json.decode(content);
+      config = json.decode(content);
     }
+
+    // Ensure ignore_phrases is always a list
+    config['ignore_phrases'] = (config.containsKey('ignore_phrases') &&
+            config['ignore_phrases'] is List)
+        ? List<String>.from(config['ignore_phrases'])
+        : <String>[];
+
+    return config;
   }
 }
