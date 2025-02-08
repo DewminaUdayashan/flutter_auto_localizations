@@ -15,8 +15,9 @@ void main() async {
     final shouldRunPubGet =
         config.containsKey("run_pub_get") ? config["run_pub_get"] : true;
 
-    final ignorePhrases =
-        List<String>.from(config["ignore_phrases"]); // Load ignore phrases
+    final globalIgnorePhrases = List<String>.from(config["ignore_phrases"]);
+    final keyConfig = Map<String, dynamic>.from(
+        config["key_config"]); // Load per-key ignore settings
 
     final arbFile = "$localizationDir/app_$defaultLang.arb";
     final data = FileManager.readArbFile(arbFile);
@@ -29,7 +30,8 @@ void main() async {
       exit(1);
     }
 
-    final translator = Translator(apiKey, ignorePhrases: ignorePhrases);
+    final translator = Translator(apiKey,
+        globalIgnorePhrases: globalIgnorePhrases, keyConfig: keyConfig);
 
     for (final lang in targetLanguages) {
       print("\n🌍 Translating to $lang...");
@@ -40,13 +42,14 @@ void main() async {
       int currentProgress = 0;
 
       for (final key in data.keys) {
-        if (key.startsWith('@')) continue;
+        if (key.startsWith('@')) continue; // Skip metadata keys
 
+        // Show progress
         currentProgress++;
         stdout.write("\r📌 Progress: $currentProgress / $totalEntries");
 
         newData[key] =
-            await translator.translateText(data[key], defaultLang, lang);
+            await translator.translateText(key, data[key], defaultLang, lang);
       }
 
       final newFile = "$localizationDir/app_$lang.arb";

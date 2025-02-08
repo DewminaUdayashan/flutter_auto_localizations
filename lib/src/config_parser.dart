@@ -37,6 +37,12 @@ class ConfigParser {
         ? List<String>.from(config['ignore_phrases'])
         : <String>[];
 
+    // Ensure key_config exists
+    config['key_config'] = config.containsKey('key_config') &&
+            config['key_config'] is Map<String, dynamic>
+        ? Map<String, dynamic>.from(config['key_config'])
+        : <String, dynamic>{};
+
     return config;
   }
 }

@@ -5,57 +5,100 @@ import 'package:test/test.dart';
 // Mock class for Translator
 class MockTranslator extends Mock implements Translator {
   @override
-  final List<String> ignorePhrases;
+  final List<String> globalIgnorePhrases;
+  @override
+  final Map<String, dynamic> keyConfig;
 
-  MockTranslator({this.ignorePhrases = const []});
+  MockTranslator(
+      {this.globalIgnorePhrases = const [], this.keyConfig = const {}});
 
   @override
   Future<String> translateText(
-      String text, String fromLang, String toLang) async {
+      String key, String text, String fromLang, String toLang) async {
     if (text.isEmpty) {
       throw Exception("Invalid text");
     }
 
-    // Simulating phrase exclusion logic
-    for (var phrase in ignorePhrases) {
+    // Check if key has `skipIgnorePhrases` enabled
+    if (keyConfig.containsKey(key) &&
+        keyConfig[key]['skipIgnorePhrases'] == true) {
+      return "Translated: $text"; // Simulate normal translation without ignore phrases
+    }
+
+    // Determine which ignore phrases to use
+    List<String> ignorePhrases = globalIgnorePhrases;
+    if (keyConfig.containsKey(key) &&
+        keyConfig[key].containsKey('ignore_phrases')) {
+      ignorePhrases = List<String>.from(keyConfig[key]['ignore_phrases']);
+    }
+
+    // Simulate ignoring phrases
+    String translatedText = "Translated: $text"; // Fake translation
+    for (String phrase in ignorePhrases) {
       if (text.contains(phrase)) {
-        return text.replaceAll(phrase, phrase); // Return unchanged phrase
+        translatedText =
+            text.replaceAll(phrase, phrase); // Keep phrase unchanged
       }
     }
 
-    return "Texto traducido"; // Fake translated text
+    return translatedText;
   }
 }
 
 void main() {
   group('Translator', () {
-    final mockTranslator =
-        MockTranslator(ignorePhrases: ['Status Saver', 'Flutter Pro']);
+    final mockTranslator = MockTranslator(
+      globalIgnorePhrases: ["Flutter", "Status Saver"],
+      keyConfig: {
+        'helloWorld': {
+          'skipIgnorePhrases': true
+        }, // This should bypass ignore phrases
+        'desc': {
+          'ignore_phrases': ['WhatsApp', 'Dewmina']
+        }, // Custom ignore list
+        'status': {
+          'ignore_phrases': ['Status Saver']
+        } // Custom per-key ignore
+      },
+    );
 
-    test('Translates text correctly', () async {
-      final result = await mockTranslator.translateText('Hello', 'en', 'es');
-      expect(result, equals("Texto traducido"));
+    test('Translates text correctly when no ignore rules apply', () async {
+      final result =
+          await mockTranslator.translateText('hello', 'Hello', 'en', 'es');
+      expect(result, equals("Translated: Hello"));
     });
 
-    test('Ignores specified phrases inside a sentence', () async {
+    test('Ignores phrases inside a key based on config', () async {
+      final result = await mockTranslator.translateText('desc',
+          'This is an app for WhatsApp Status, Created by Dewmina', 'en', 'es');
+      expect(result, contains("WhatsApp")); // WhatsApp should remain unchanged
+      expect(result, contains("Dewmina")); // Dewmina should remain unchanged
+    });
+
+    test('Skips ignore check when `skipIgnorePhrases` is true', () async {
       final result = await mockTranslator.translateText(
-          'Welcome to Status Saver', 'en', 'es');
-      expect(
-          result, contains("Welcome to Status Saver")); // Partial translation
+          'helloWorld', 'Welcome to Status Saver', 'en', 'es');
+      expect(result,
+          equals("Translated: Welcome to Status Saver")); // Fully translated
     });
 
-    test('Ignores multiple phrases in a sentence', () async {
+    test('Respects per-key ignore rules', () async {
       final result = await mockTranslator.translateText(
-          'Status Saver is a product of Flutter Pro', 'en', 'es');
-      expect(
-          result,
-          contains(
-              "Status Saver is a product of Flutter Pro")); // Multiple ignored phrases
+          'status', 'Status Saver is available for everyone', 'en', 'es');
+      expect(result,
+          contains("Status Saver")); // Status Saver should not be translated
     });
 
-    test('Handles errors gracefully', () async {
+    test('Applies global ignore phrases when no per-key override is set',
+        () async {
+      final result = await mockTranslator.translateText(
+          'randomKey', 'Flutter is awesome', 'en', 'es');
+      expect(result, contains("Flutter")); // Flutter should remain unchanged
+    });
+
+    test('Handles errors gracefully when empty text is given', () async {
       try {
-        await mockTranslator.translateText('', 'en', 'es');
+        await mockTranslator.translateText('randomKey', '', 'en', 'es');
         fail('Should throw an exception');
       } catch (e) {
         expect(e, isA<Exception>());
