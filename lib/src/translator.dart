@@ -5,28 +5,37 @@ import 'package:http/http.dart' as http;
 class Translator {
   final String apiKey;
   final List<String> globalIgnorePhrases;
-  final Map<String, dynamic> keyConfig; // Store per-key settings
+  final Map<String, dynamic> keyConfig;
 
   Translator(this.apiKey,
       {this.globalIgnorePhrases = const [], this.keyConfig = const {}});
 
   Future<String> translateText(
       String key, String text, String fromLang, String toLang) async {
+    if (text.isEmpty) {
+      throw Exception("Invalid text");
+    }
+
     // Check if key has `skipIgnorePhrases` enabled
     if (keyConfig.containsKey(key) &&
         keyConfig[key]['skipIgnorePhrases'] == true) {
-      print("🔹 Skipping ignore phrases check for key: $key");
       return _translate(text, fromLang, toLang);
     }
 
-    // Check if key has its own ignore_phrases
+    // Determine ignore phrases for this key
     List<String> ignorePhrases = globalIgnorePhrases;
     if (keyConfig.containsKey(key) &&
         keyConfig[key].containsKey('ignore_phrases')) {
       ignorePhrases = List<String>.from(keyConfig[key]['ignore_phrases']);
     }
 
-    // Replace ignored phrases with placeholders
+    // ✅ NEW FIX: If the entire text matches an ignored phrase, return as-is.
+    if (ignorePhrases.contains(text)) {
+      print("🔹 Skipping translation for exact match: $text");
+      return text;
+    }
+
+    // Placeholder replacement logic for partial matches
     Map<String, String> placeholderMap = {};
     String modifiedText = text;
 
