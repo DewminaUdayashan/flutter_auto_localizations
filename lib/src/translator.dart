@@ -16,15 +16,14 @@ class Translator {
       throw Exception("❌ Error: Cannot translate empty text.");
     }
 
-    // ✅ **Check if `skipIgnorePhrases` is enabled for this key**
-    if (keyConfig.containsKey(key) &&
-        keyConfig[key]['skipIgnorePhrases'] == true) {
-      return _translate(text, fromLang, toLang);
-    }
-
     // ✅ **Handle ICU Plural Messages Separately**
     if (_isICUPluralMessage(text)) {
       return _translateICUPluralMessage(key, text, fromLang, toLang);
+    }
+
+    // ✅ **Handle ICU Plural Select Separately**
+    if (_isICUSelectMessage(text)) {
+      return _translateICUSelectMessage(key, text, fromLang, toLang);
     }
 
     if (_shouldSkipTranslation(text)) return text;
@@ -32,7 +31,7 @@ class Translator {
     // ✅ **Apply Ignore Phrases BEFORE translation**
     Map<String, String> placeholderMap = {};
     String modifiedText =
-        _applyIgnorePhrasesBeforeTranslation(text, placeholderMap);
+        _applyIgnorePhrasesBeforeTranslation(key, text, placeholderMap);
 
     // ✅ **Translate the modified text**
     String translatedText = await _translate(modifiedText, fromLang, toLang);
@@ -42,6 +41,57 @@ class Translator {
         _restoreIgnoredPhrasesAfterTranslation(translatedText, placeholderMap);
 
     return translatedText;
+  }
+
+  /// ✅ **Detects ICU Gender-Based Select Messages**
+  bool _isICUSelectMessage(String text) {
+    return text.contains(RegExp(r'{\w+, select,'));
+  }
+
+  /// ✅ **Processes and Translates ICU Select Messages Correctly**
+  Future<String> _translateICUSelectMessage(
+      String key, String text, String fromLang, String toLang) async {
+    final regex = RegExp(r'\{(\w+), select, (.+)\}$', dotAll: true);
+    final match = regex.firstMatch(text);
+
+    if (match == null) {
+      return text; // Return original if no select pattern detected
+    }
+
+    final variable =
+        match.group(1)!; // Extract placeholder variable (e.g., "sex")
+    String selectRules =
+        match.group(2)!; // Extract all rules: male{}, female{}, other{}
+
+    final translatedRules = <String, String>{};
+
+    // ✅ **Regex to Capture All Select Rules Properly**
+    final ruleRegex = RegExp(r'(\w+)\{((?:[^\{\}]|\{[^\{\}]*\})*)\}');
+
+    for (final ruleMatch in ruleRegex.allMatches(selectRules)) {
+      final ruleType = ruleMatch.group(1)!; // e.g., "male", "female", "other"
+      String ruleText = ruleMatch.group(2)!; // e.g., "His birthday"
+
+      // ✅ **Apply ignore phrases before translation**
+      Map<String, String> placeholderMap = {};
+      ruleText =
+          _applyIgnorePhrasesBeforeTranslation(key, ruleText, placeholderMap);
+
+      // ✅ **Translate the modified text**
+      String translatedRuleText = await _translate(ruleText, fromLang, toLang);
+
+      // ✅ **Restore ignored phrases AFTER translation**
+      translatedRuleText = _restoreIgnoredPhrasesAfterTranslation(
+          translatedRuleText, placeholderMap);
+
+      translatedRules[ruleType] = translatedRuleText;
+    }
+
+    // ✅ **Rebuild the ICU select message format correctly**
+    final translatedSelectText =
+        '{$variable, select, ${translatedRules.entries.map((e) => '${e.key}{${e.value}}').join(' ')}}';
+
+    return translatedSelectText;
   }
 
   /// ✅ **Detects ICU Plural Messages**
@@ -75,7 +125,8 @@ class Translator {
 
       // ✅ **Apply ignore phrases before translation**
       Map<String, String> placeholderMap = {};
-      ruleText = _applyIgnorePhrasesBeforeTranslation(ruleText, placeholderMap);
+      ruleText =
+          _applyIgnorePhrasesBeforeTranslation(key, ruleText, placeholderMap);
       ruleText = ruleText.replaceAll('{count}', '[COUNT_PLACEHOLDER]');
 
       // ✅ **Translate the modified text**
@@ -107,22 +158,37 @@ class Translator {
       globalIgnorePhrases.contains(text);
 
   /// ✅ **Applies Ignore Phrases Before Translation**
-  /// - Replaces ignored words with placeholders before translation.
-  /// - Stores original words in `placeholderMap` for later restoration.
+  /// - Uses per-key ignore phrases if `skipIgnorePhrases == true`.
+  /// - Otherwise, merges global and per-key ignore phrases.
+  /// - Replaces ignored words with placeholders.
   String _applyIgnorePhrasesBeforeTranslation(
-      String text, Map<String, String> placeholderMap) {
-    if (keyConfig.containsKey(text) &&
-        keyConfig[text]['skipIgnorePhrases'] == true) {
-      return text; // Skip ignore checks if configured
-    }
+    String key,
+    String text,
+    Map<String, String> placeholderMap,
+  ) {
+    // Retrieve per-key ignore phrases
+    List<String> perKeyIgnorePhrases =
+        keyConfig.containsKey(key) && keyConfig[key]['ignore_phrases'] is List
+            ? List<String>.from(keyConfig[key]['ignore_phrases'])
+            : [];
+
+    // Determine if we should skip global ignore phrases
+    bool skipGlobalIgnore = keyConfig.containsKey(key) &&
+        keyConfig[key]['skipIgnorePhrases'] == true;
+
+    // If skipIgnorePhrases is true, only use per-key ignore phrases.
+    // Otherwise, merge global and per-key ignore phrases.
+    List<String> combinedIgnorePhrases = skipGlobalIgnore
+        ? perKeyIgnorePhrases
+        : [...globalIgnorePhrases, ...perKeyIgnorePhrases];
 
     String modifiedText = text;
 
-    for (int i = 0; i < globalIgnorePhrases.length; i++) {
-      String phrase = globalIgnorePhrases[i];
+    for (int i = 0; i < combinedIgnorePhrases.length; i++) {
+      String phrase = combinedIgnorePhrases[i];
 
       if (modifiedText.contains(phrase)) {
-        String placeholder = "[IGNORE_$i]";
+        final placeholder = "[IGNORE_$i]";
         placeholderMap[placeholder] = phrase;
         modifiedText = modifiedText.replaceAll(phrase, placeholder);
       }
