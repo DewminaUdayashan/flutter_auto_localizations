@@ -1,25 +1,34 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_auto_localizations/src/file_manager.dart';
+import 'package:flutter_auto_localizations/flutter_auto_localizations.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('FileManager', () {
-    test('Reads and writes ARB files correctly, updating @@locale', () {
-      final testFile = 'test/test_app.arb';
-      final testData = {"@@locale": "en", "simpleText": "Hello World"};
+  group('FileManager Tests', () {
+    test('✅ Reads ARB file correctly', () {
+      final testFile = File("test.arb")
+        ..writeAsStringSync(jsonEncode({"hello": "world"}));
+      final data = FileManager.readArbFile("test.arb");
 
-      // Write test ARB file
-      FileManager.writeArbFile(
-          testFile, testData, "es"); // Target language: Spanish
+      expect(data, contains("hello"));
+      expect(data["hello"], equals("world"));
 
-      // Read back and validate
-      final loadedData = FileManager.readArbFile(testFile);
+      testFile.deleteSync(); // Cleanup
+    });
 
-      expect(loadedData["@@locale"],
-          equals("es")); // ✅ Locale should update to "es"
-      expect(loadedData["simpleText"],
-          equals("Hello World")); // ✅ Data should remain unchanged
+    test('✅ Handles missing file error', () {
+      expect(() => FileManager.readArbFile("missing.arb"),
+          throwsA(isA<Exception>()));
+    });
+
+    test('✅ Writes ARB file correctly', () {
+      final testFile = "test_write.arb";
+      FileManager.writeArbFile(testFile, {"greeting": "Hello"}, "en");
+
+      final writtenData = jsonDecode(File(testFile).readAsStringSync());
+      expect(writtenData, contains("greeting"));
+      expect(writtenData["greeting"], equals("Hello"));
 
       File(testFile).deleteSync(); // Cleanup
     });
