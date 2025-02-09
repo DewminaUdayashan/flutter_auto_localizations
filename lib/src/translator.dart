@@ -6,9 +6,15 @@ class Translator {
   final String apiKey;
   final List<String> globalIgnorePhrases;
   final Map<String, dynamic> keyConfig;
+  final http.Client httpClient; // ✅ Inject HTTP client for testing
 
-  Translator(this.apiKey,
-      {this.globalIgnorePhrases = const [], this.keyConfig = const {}});
+  Translator(
+    this.apiKey, {
+    this.globalIgnorePhrases = const [],
+    this.keyConfig = const {},
+    http.Client? httpClient, // Optional, allows injection
+  }) : httpClient =
+            httpClient ?? http.Client(); // ✅ Default to real HTTP client
 
   Future<String> translateText(
       String key, String text, String fromLang, String toLang) async {
@@ -138,7 +144,7 @@ class Translator {
     final url = Uri.parse(
         'https://translation.googleapis.com/language/translate/v2?key=$apiKey');
 
-    final response = await http.post(url,
+    final response = await httpClient.post(url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           "q": text,
