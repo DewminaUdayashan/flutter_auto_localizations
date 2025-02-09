@@ -17,7 +17,11 @@ class Translator {
             httpClient ?? http.Client(); // ✅ Default to real HTTP client
 
   Future<String> translateText(
-      String key, String text, String fromLang, String toLang) async {
+    String key,
+    String text,
+    String fromLang,
+    String toLang,
+  ) async {
     if (text.isEmpty) {
       throw Exception("❌ Error: Cannot translate empty text.");
     }
@@ -34,7 +38,7 @@ class Translator {
 
     // ✅ Apply Ignore Phrases BEFORE translation
     Map<String, String> placeholderMap = {};
-    String modifiedText =
+    final modifiedText =
         _replaceIgnorePhrasesWithPlaceholders(key, text, placeholderMap);
 
     // ✅ Translate the modified text
@@ -57,8 +61,13 @@ class Translator {
   }
 
   /// ✅ Processes and Translates ICU Messages (Plural or Select)
-  Future<String> _processICUMessage(String key, String text, String fromLang,
-      String toLang, String type) async {
+  Future<String> _processICUMessage(
+    String key,
+    String text,
+    String fromLang,
+    String toLang,
+    String type,
+  ) async {
     final regex = RegExp(r'\{(\w+), ' + type + r', (.+)\}$', dotAll: true);
     final match = regex.firstMatch(text);
 
@@ -67,14 +76,14 @@ class Translator {
     }
 
     final variable = match.group(1)!;
-    String rules = match.group(2)!;
+    final rules = match.group(2)!;
 
     final translatedRules = <String, String>{};
     final ruleRegex = RegExp(r'(\w+)\{((?:[^\{\}]|\{[^\{\}]*\})*)\}');
 
     for (final ruleMatch in ruleRegex.allMatches(rules)) {
       final ruleType = ruleMatch.group(1)!;
-      String ruleText = ruleMatch.group(2)!;
+      final ruleText = ruleMatch.group(2)!;
 
       translatedRules[ruleType] =
           await _translateTextSegment(ruleText, fromLang, toLang, key);
@@ -85,12 +94,16 @@ class Translator {
 
   /// ✅ Translates a text segment while handling placeholders
   Future<String> _translateTextSegment(
-      String text, String fromLang, String toLang, String key) async {
-    Map<String, String> placeholderMap = {};
+    String text,
+    String fromLang,
+    String toLang,
+    String key,
+  ) async {
+    final Map<String, String> placeholderMap = {};
     String modifiedText =
         _replaceIgnorePhrasesWithPlaceholders(key, text, placeholderMap);
 
-    String translatedText = await _translate(modifiedText, fromLang, toLang);
+    final translatedText = await _translate(modifiedText, fromLang, toLang);
     return _restorePlaceholders(translatedText, placeholderMap);
   }
 
@@ -101,10 +114,10 @@ class Translator {
 
   /// ✅ Retrieves ignore phrases for a given key (Merges global + per-key)
   List<String> _getIgnorePhrasesForKey(String key) {
-    List<String> perKeyIgnorePhrases =
+    final perKeyIgnorePhrases =
         keyConfig.containsKey(key) && keyConfig[key]['ignore_phrases'] is List
             ? List<String>.from(keyConfig[key]['ignore_phrases'])
-            : [];
+            : <String>[];
 
     return keyConfig.containsKey(key) &&
             keyConfig[key]['skipIgnorePhrases'] == true
@@ -114,20 +127,22 @@ class Translator {
 
   /// ✅ Replaces ignore phrases with placeholders before translation
   String _replaceIgnorePhrasesWithPlaceholders(
-      String key, String text, Map<String, String> placeholderMap) {
-    List<String> ignorePhrases = _getIgnorePhrasesForKey(key);
-    String modifiedText = text;
+    String key,
+    String text,
+    Map<String, String> placeholderMap,
+  ) {
+    final ignorePhrases = _getIgnorePhrasesForKey(key);
 
     for (int i = 0; i < ignorePhrases.length; i++) {
-      String phrase = ignorePhrases[i];
+      final phrase = ignorePhrases[i];
 
-      if (modifiedText.contains(phrase)) {
+      if (text.contains(phrase)) {
         final placeholder = "[IGNORE_$i]";
         placeholderMap[placeholder] = phrase;
-        modifiedText = modifiedText.replaceAll(phrase, placeholder);
+        text = text.replaceAll(phrase, placeholder);
       }
     }
-    return modifiedText;
+    return text;
   }
 
   /// ✅ Restores placeholders after translation

@@ -5,8 +5,8 @@ import 'package:yaml/yaml.dart';
 
 class ConfigParser {
   static Map<String, dynamic> loadConfig({String? customPath}) {
-    final String yamlConfigPath = customPath ?? "translation_config.yaml";
-    final String jsonConfigPath = customPath ?? "translation_config.json";
+    final yamlConfigPath = customPath ?? "translation_config.yaml";
+    final jsonConfigPath = customPath ?? "translation_config.json";
 
     File? configFile;
 

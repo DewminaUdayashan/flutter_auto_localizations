@@ -24,10 +24,10 @@ class TranslationEstimator {
     });
 
     // Calculate estimated total translated characters
-    int estimatedTranslatedCharacters = totalCharacters * targetLanguages.length;
+    final estimatedTranslatedCharacters = totalCharacters * targetLanguages.length;
 
     // ✅ Calculate estimated cost for ALL characters (no free tier subtraction)
-    double estimatedCost = (estimatedTranslatedCharacters / 1_000_000) * pricePerMillion;
+    final estimatedCost = (estimatedTranslatedCharacters / 1_000_000) * pricePerMillion;
 
     // Display output
     print("\n📊 Translation Character Estimate:");
