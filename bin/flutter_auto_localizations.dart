@@ -19,14 +19,30 @@ void main() async {
     final keyConfig = Map<String, dynamic>.from(config["key_config"]);
 
     final arbFile = "$localizationDir/app_$defaultLang.arb";
-    final data = FileManager.readArbFile(arbFile);
+    if (!File(arbFile).existsSync()) {
+      print("❌ Error: Source ARB file not found: $arbFile");
+      exit(1);
+    }
 
+    final data = FileManager.readArbFile(arbFile);
     final apiKey = env['GOOGLE_TRANSLATE_API_KEY'] ??
         Platform.environment['GOOGLE_TRANSLATE_API_KEY'];
 
     if (apiKey == null) {
       print("❌ Missing GOOGLE_TRANSLATE_API_KEY environment variable.");
       exit(1);
+    }
+
+    // ✅ Estimate translation cost before starting
+    TranslationEstimator.estimateTranslationCost(arbFile, targetLanguages);
+
+    // ✅ Ask for confirmation before proceeding
+    stdout.write("\n🔄 Proceed with translation? (yes/no): ");
+    String? userInput = stdin.readLineSync()?.trim().toLowerCase();
+
+    if (userInput != "yes") {
+      print("❌ Translation cancelled.");
+      exit(0);
     }
 
     final translator = Translator(apiKey,
@@ -51,8 +67,7 @@ void main() async {
       }
 
       final newFile = "$localizationDir/app_$lang.arb";
-      FileManager.writeArbFile(
-          newFile, newData, lang); // ✅ Pass target locale for @@locale update
+      FileManager.writeArbFile(newFile, newData, lang);
       print("\n✅ Translated file saved: $newFile");
     }
 
