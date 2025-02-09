@@ -38,7 +38,7 @@ void main() async {
 
     // ✅ Ask for confirmation before proceeding
     stdout.write("\n🔄 Proceed with translation? (yes/no): ");
-    String? userInput = stdin.readLineSync()?.trim().toLowerCase();
+    final userInput = stdin.readLineSync()?.trim().toLowerCase();
 
     if (userInput != "yes") {
       print("❌ Translation cancelled.");

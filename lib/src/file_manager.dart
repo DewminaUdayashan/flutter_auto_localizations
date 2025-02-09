@@ -11,7 +11,10 @@ class FileManager {
   }
 
   static void writeArbFile(
-      String path, Map<String, dynamic> data, String targetLocale) {
+    String path,
+    Map<String, dynamic> data,
+    String targetLocale,
+  ) {
     final file = File(path);
 
     // ✅ Update @@locale to match the target language code
