@@ -19,11 +19,11 @@ template-arb-file: app_en.arb
 languages:
   - fr
   - es
-ignore_phrases:
+global_ignore_phrases:
   - "test"
 key_config:
   example_key:
-    skipIgnorePhrases: true
+    skipGlobalIgnore: true
 """);
 
     // Ensure file system flush before reading
@@ -47,9 +47,9 @@ key_config:
       expect(config["template_arb_file"], equals("app_en.arb"));
       expect(config["default_lang"], equals("en"));
       expect(config["languages"], containsAll(["fr", "es"]));
-      expect(config["ignore_phrases"], contains("test"));
+      expect(config["global_ignore_phrases"], contains("test"));
       expect(config["key_config"], contains("example_key"));
-      expect(config["key_config"]["example_key"]["skipIgnorePhrases"], isTrue);
+      expect(config["key_config"]["example_key"]["skipGlobalIgnore"], isTrue);
     });
 
     test('✅ Throws exception when l10n.yaml is missing', () {

@@ -16,7 +16,8 @@ void main() async {
     final targetLanguages = List<String>.from(config["languages"]);
     final shouldRunPubGet =
         config.containsKey("run_pub_get") ? config["run_pub_get"] : true;
-    final globalIgnorePhrases = List<String>.from(config["ignore_phrases"]);
+    final globalIgnorePhrases =
+        List<String>.from(config["global_ignore_phrases"]);
     final keyConfig = Map<String, dynamic>.from(config["key_config"]);
 
     final arbFile = "$localizationDir/$templateArbFile";
