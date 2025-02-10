@@ -4,21 +4,22 @@ import 'package:dotenv/dotenv.dart';
 import 'package:flutter_auto_localizations/flutter_auto_localizations.dart';
 
 void main() async {
-  const localizationDir = "lib/l10n/";
-
   try {
     final env = DotEnv(includePlatformEnvironment: true)..load();
     final config = ConfigParser.loadConfig();
 
-    final defaultLang = config["default"];
+    // Extract dynamic localization settings
+    final localizationDir = config["localization_dir"];
+    final templateArbFile = config["template_arb_file"];
+    final defaultLang = config["default_lang"];
+
     final targetLanguages = List<String>.from(config["languages"]);
     final shouldRunPubGet =
         config.containsKey("run_pub_get") ? config["run_pub_get"] : true;
-
     final globalIgnorePhrases = List<String>.from(config["ignore_phrases"]);
     final keyConfig = Map<String, dynamic>.from(config["key_config"]);
 
-    final arbFile = "$localizationDir/app_$defaultLang.arb";
+    final arbFile = "$localizationDir/$templateArbFile";
     if (!File(arbFile).existsSync()) {
       print("❌ Error: Source ARB file not found: $arbFile");
       exit(1);
