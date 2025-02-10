@@ -57,12 +57,29 @@ template-arb-file: app_en.arb
 output-localization-file: app_localizations.dart
 
 languages:
-  - en
+  - si
   - es
   - fr
 ```
 
 ##### 🔹 Find supported translation languages [here](https://cloud.google.com/translate/docs/languages).
+
+### 2. Create the ARB Directory and Default ARB File
+
+After configuring l10n.yaml, create the localization directory and the default ARB file as specified in **arb-dir** and **template-arb-file**.
+
+##### 📌 Example app_en.arb File
+
+```json
+{
+  "title": "Welcome to My App",
+  "welcomeMessage": "Hello, {username}!",
+  "cart_items": "{count, plural, zero{Your cart is empty} one{You have one item} other{You have {count} items}}",
+  "@cart_items": {
+    "description": "Pluralized message for cart items."
+  }
+}
+```
 
 ### 2. Set Up Google Cloud Translation API
 
