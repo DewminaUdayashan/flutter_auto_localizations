@@ -9,7 +9,7 @@
     },
     {
       "name": "_macros",
-      "rootUri": "file:///Users/dewminaudayashan/development/flutter/bin/cache/dart-sdk/pkg/_macros",
+      "rootUri": "file:///Users/dewminaudayashan/fvm/versions/stable/bin/cache/dart-sdk/pkg/_macros",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -431,13 +431,13 @@
       "name": "flutter_auto_localizations",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "3.6"
+      "languageVersion": "2.17"
     }
   ],
-  "generated": "2025-02-09T07:27:27.857797Z",
+  "generated": "2025-02-10T15:46:33.767609Z",
   "generator": "pub",
-  "generatorVersion": "3.6.1",
-  "flutterRoot": "file:///Users/dewminaudayashan/development/flutter",
-  "flutterVersion": "3.27.3",
+  "generatorVersion": "3.6.2",
+  "flutterRoot": "file:///Users/dewminaudayashan/fvm/versions/stable",
+  "flutterVersion": "3.27.4",
   "pubCache": "file:///Users/dewminaudayashan/.pub-cache"
 }
