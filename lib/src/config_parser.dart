@@ -4,32 +4,17 @@ import 'dart:io';
 import 'package:yaml/yaml.dart';
 
 class ConfigParser {
-  static Map<String, dynamic> loadConfig({String? customPath}) {
-    final yamlConfigPath = customPath ?? "translation_config.yaml";
-    final jsonConfigPath = customPath ?? "translation_config.json";
+  static Map<String, dynamic> loadConfig() {
+    const yamlConfigPath =
+        "l10n.yaml"; // Standard Flutter localization config file
 
-    File? configFile;
-
-    if (File(yamlConfigPath).existsSync()) {
-      configFile = File(yamlConfigPath);
-      print("✅ Using YAML configuration: $yamlConfigPath");
-    } else if (File(jsonConfigPath).existsSync()) {
-      configFile = File(jsonConfigPath);
-      print("✅ Using JSON configuration: $jsonConfigPath");
-    } else {
-      throw Exception(
-          "❌ No configuration file found at $yamlConfigPath or $jsonConfigPath.");
+    if (!File(yamlConfigPath).existsSync()) {
+      throw Exception("❌ No configuration file found: $yamlConfigPath.");
     }
 
-    final content = configFile.readAsStringSync();
-    Map<String, dynamic> config;
-
-    if (configFile.path.endsWith(".yaml") || configFile.path.endsWith(".yml")) {
-      config = json.decode(
-          json.encode(loadYaml(content))); // Convert YAML to JSON format
-    } else {
-      config = json.decode(content);
-    }
+    final content = File(yamlConfigPath).readAsStringSync();
+    Map<String, dynamic> config = json
+        .decode(json.encode(loadYaml(content))); // Convert YAML to JSON format
 
     // Ensure ignore_phrases is always a list
     config['ignore_phrases'] = (config.containsKey('ignore_phrases') &&
