@@ -68,7 +68,7 @@ class Translator {
     String toLang,
     String type,
   ) async {
-    final regex = RegExp(r'\{(\w+), ' + type + r', (.+)\}$', dotAll: true);
+    final regex = RegExp(r'\{(\w+), ' + type + r',\s*(.+)\}$', dotAll: true);
     final match = regex.firstMatch(text);
 
     if (match == null) {
@@ -79,11 +79,17 @@ class Translator {
     final rules = match.group(2)!;
 
     final translatedRules = <String, String>{};
-    final ruleRegex = RegExp(r'(\w+)\{((?:[^\{\}]|\{[^\{\}]*\})*)\}');
+    final ruleRegex = RegExp(r'([=\w]+)\s*\{((?:[^{},]|\{[^{}]*\})*)\}');
 
     for (final ruleMatch in ruleRegex.allMatches(rules)) {
       final ruleType = ruleMatch.group(1)!;
       final ruleText = ruleMatch.group(2)!;
+
+      // ✅ Check if the rule contains an ignored phrase, and skip translation if needed
+      if (_shouldSkipTranslation(key, ruleText)) {
+        translatedRules[ruleType] = ruleText;
+        continue;
+      }
 
       translatedRules[ruleType] =
           await _translateTextSegment(ruleText, fromLang, toLang, key);
@@ -102,7 +108,7 @@ class Translator {
     final Map<String, String> placeholderMap = {};
     String modifiedText =
         _replaceIgnorePhrasesWithPlaceholders(key, text, placeholderMap);
-
+    print(modifiedText);
     final translatedText = await _translate(modifiedText, fromLang, toLang);
     return _restorePlaceholders(translatedText, placeholderMap);
   }
@@ -114,13 +120,13 @@ class Translator {
 
   /// ✅ Retrieves ignore phrases for a given key (Merges global + per-key)
   List<String> _getIgnorePhrasesForKey(String key) {
-    final perKeyIgnorePhrases =
-        keyConfig.containsKey(key) && keyConfig[key]['ignore_phrases'] is List
-            ? List<String>.from(keyConfig[key]['ignore_phrases'])
-            : <String>[];
+    final perKeyIgnorePhrases = keyConfig.containsKey(key) &&
+            keyConfig[key]['key_ignore_phrases'] is List
+        ? List<String>.from(keyConfig[key]['key_ignore_phrases'])
+        : <String>[];
 
     return keyConfig.containsKey(key) &&
-            keyConfig[key]['skipIgnorePhrases'] == true
+            keyConfig[key]['skipGlobalIgnore'] == true
         ? perKeyIgnorePhrases
         : [...globalIgnorePhrases, ...perKeyIgnorePhrases];
   }
@@ -131,8 +137,19 @@ class Translator {
     String text,
     Map<String, String> placeholderMap,
   ) {
-    final ignorePhrases = _getIgnorePhrasesForKey(key);
+    // ✅ Protect ICU variables like {name}, {count}, etc.
+    // If this isn't implemented, some time the placeholders of ICU messages
+    // gets translated if it is the only word in the message
+    final icuVariableRegex = RegExp(r'\{(\w+)\}');
+    text = text.replaceAllMapped(icuVariableRegex, (match) {
+      final placeholder = "[ICU_${match.group(1)}]";
+      placeholderMap[placeholder] =
+          match.group(0)!; // Store the original {name}, {count}, etc.
+      return placeholder;
+    });
 
+    // ✅ Replace ignore phrases normally
+    final ignorePhrases = _getIgnorePhrasesForKey(key);
     for (int i = 0; i < ignorePhrases.length; i++) {
       final phrase = ignorePhrases[i];
 
@@ -142,6 +159,7 @@ class Translator {
         text = text.replaceAll(phrase, placeholder);
       }
     }
+
     return text;
   }
 
