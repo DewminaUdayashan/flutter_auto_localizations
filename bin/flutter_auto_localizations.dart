@@ -19,6 +19,7 @@ void main() async {
     final globalIgnorePhrases =
         List<String>.from(config["global_ignore_phrases"]);
     final keyConfig = Map<String, dynamic>.from(config["key_config"]);
+    final enableCache = config['enable_cache'] as bool;
 
     final arbFile = "$localizationDir/$templateArbFile";
     if (!File(arbFile).existsSync()) {
@@ -51,6 +52,7 @@ void main() async {
       apiKey,
       globalIgnorePhrases: globalIgnorePhrases,
       keyConfig: keyConfig,
+      enableCache: enableCache,
     );
 
     for (final lang in targetLanguages) {

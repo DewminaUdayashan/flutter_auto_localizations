@@ -67,12 +67,18 @@ class ConfigParser {
       }
     });
 
+    // Read cache setting, default to true if not specified
+    final enableCache = config.containsKey('enable_cache')
+        ? config['enable_cache'] == true
+        : true;
+
     // Inject dynamically parsed values
     config['localization_dir'] = localizationDir;
     config['template_arb_file'] = templateArbFile;
     config['default_lang'] = defaultLang;
     config['global_ignore_phrases'] = globalIgnorePhrases;
     config['key_config'] = keyConfig;
+    config['enable_cache'] = enableCache;
 
     return config;
   }

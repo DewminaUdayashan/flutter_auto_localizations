@@ -8,6 +8,7 @@ class Translator {
   final String apiKey;
   final List<String> globalIgnorePhrases;
   final Map<String, dynamic> keyConfig;
+  final bool enableCache;
   final http.Client httpClient; // ✅ Inject HTTP client for testing
   final CacheManager cacheManager; // ✅ Inject CacheManager for testing
 
@@ -15,10 +16,11 @@ class Translator {
     this.apiKey, {
     this.globalIgnorePhrases = const [],
     this.keyConfig = const {},
+    this.enableCache = true,
     CacheManager? cacheManager,
     http.Client? httpClient, // Optional, allows injection
   })  : httpClient = httpClient ?? http.Client(),
-        cacheManager = cacheManager ?? CacheManager();
+        cacheManager = cacheManager ?? CacheManager(enableCache: enableCache);
 
   Future<String> translateText(
     String key,
@@ -32,7 +34,6 @@ class Translator {
 
     // ✅ Check Cache First
     if (cacheManager.hasTranslation(cacheKey)) {
-      print('TRANSLATION AVAILABLE ON THE CACHE');
       return cacheManager.getTranslation(cacheKey)!;
     }
 
