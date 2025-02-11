@@ -47,8 +47,11 @@ void main() async {
       exit(0);
     }
 
-    final translator = Translator(apiKey,
-        globalIgnorePhrases: globalIgnorePhrases, keyConfig: keyConfig);
+    final translator = Translator(
+      apiKey,
+      globalIgnorePhrases: globalIgnorePhrases,
+      keyConfig: keyConfig,
+    );
 
     for (final lang in targetLanguages) {
       print("\n🌍 Translating to $lang...");
@@ -80,6 +83,7 @@ void main() async {
     }
 
     print("\n🎉 Translation completed successfully!");
+    exit(0);
   } catch (e) {
     print("❌ Error: $e");
   }
