@@ -2,19 +2,23 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'cache_manager.dart';
+
 class Translator {
   final String apiKey;
   final List<String> globalIgnorePhrases;
   final Map<String, dynamic> keyConfig;
   final http.Client httpClient; // ✅ Inject HTTP client for testing
+  final CacheManager cacheManager; // ✅ Inject CacheManager for testing
 
   Translator(
     this.apiKey, {
     this.globalIgnorePhrases = const [],
     this.keyConfig = const {},
+    CacheManager? cacheManager,
     http.Client? httpClient, // Optional, allows injection
-  }) : httpClient =
-            httpClient ?? http.Client(); // ✅ Default to real HTTP client
+  })  : httpClient = httpClient ?? http.Client(),
+        cacheManager = cacheManager ?? CacheManager();
 
   Future<String> translateText(
     String key,
@@ -22,30 +26,48 @@ class Translator {
     String fromLang,
     String toLang,
   ) async {
-    if (text.isEmpty) {
-      throw Exception("❌ Error: Cannot translate empty text.");
+    if (text.isEmpty) return text;
+
+    final cacheKey = "$fromLang-$toLang-$text";
+
+    // ✅ Check Cache First
+    if (cacheManager.hasTranslation(cacheKey)) {
+      print('TRANSLATION AVAILABLE ON THE CACHE');
+      return cacheManager.getTranslation(cacheKey)!;
     }
+
+    late String translatedText;
 
     // ✅ Handle ICU Messages
     if (_isICUPlural(text)) {
-      return _processICUMessage(key, text, fromLang, toLang, "plural");
+      translatedText =
+          await _processICUMessage(key, text, fromLang, toLang, "plural");
+      // ✅ Store in Cache
+      cacheManager.saveTranslation(cacheKey, translatedText);
+      return translatedText;
     }
     if (_isICUSelect(text)) {
-      return _processICUMessage(key, text, fromLang, toLang, "select");
+      translatedText =
+          await _processICUMessage(key, text, fromLang, toLang, "select");
+      // ✅ Store in Cache
+      cacheManager.saveTranslation(cacheKey, translatedText);
+      return translatedText;
     }
 
     if (_shouldSkipTranslation(key, text)) return text;
 
     // ✅ Apply Ignore Phrases BEFORE translation
     Map<String, String> placeholderMap = {};
-    final modifiedText =
+    translatedText =
         _replaceIgnorePhrasesWithPlaceholders(key, text, placeholderMap);
 
     // ✅ Translate the modified text
-    String translatedText = await _translate(modifiedText, fromLang, toLang);
+    translatedText = await _translate(translatedText, fromLang, toLang);
 
     // ✅ Restore ignored phrases AFTER translation
     translatedText = _restorePlaceholders(translatedText, placeholderMap);
+    // ✅ Store in Cache
+    cacheManager.saveTranslation(cacheKey, translatedText);
 
     return translatedText;
   }
@@ -108,7 +130,6 @@ class Translator {
     final Map<String, String> placeholderMap = {};
     String modifiedText =
         _replaceIgnorePhrasesWithPlaceholders(key, text, placeholderMap);
-    print(modifiedText);
     final translatedText = await _translate(modifiedText, fromLang, toLang);
     return _restorePlaceholders(translatedText, placeholderMap);
   }
