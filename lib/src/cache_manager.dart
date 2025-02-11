@@ -2,21 +2,28 @@ import 'dart:convert';
 import 'dart:io';
 
 class CacheManager {
-  final String cacheFilePath;
-  final bool enableCache;
-  final Map<String, String> _cache = {};
+  static final CacheManager _instance = CacheManager._internal();
 
-  CacheManager({
-    this.cacheFilePath = 'translation_cache.json',
-    required this.enableCache,
+  factory CacheManager({
+    String cacheFilePath = 'translation_cache.json',
+    bool enableCache = true,
   }) {
-    if (enableCache) _loadCache();
+    _instance._cacheFilePath = cacheFilePath;
+    _instance._enableCache = enableCache;
+    if (enableCache) _instance._loadCache();
+    return _instance;
   }
+
+  CacheManager._internal(); // Private constructor
+
+  late String _cacheFilePath;
+  late bool _enableCache;
+  final Map<String, String> _cache = {};
 
   /// ✅ Load existing translations only if caching is enabled
   void _loadCache() {
-    if (!enableCache) return;
-    final file = File(cacheFilePath);
+    if (!_enableCache) return;
+    final file = File(_cacheFilePath);
     if (file.existsSync()) {
       try {
         final content = file.readAsStringSync();
@@ -29,20 +36,20 @@ class CacheManager {
 
   /// ✅ Save updated cache only if caching is enabled
   void _saveCache() {
-    if (enableCache) {
-      File(cacheFilePath).writeAsStringSync(json.encode(_cache));
+    if (_enableCache) {
+      File(_cacheFilePath).writeAsStringSync(json.encode(_cache));
     }
   }
 
   /// ✅ Check if caching is enabled before returning a cached translation
-  bool hasTranslation(String key) => enableCache && _cache.containsKey(key);
+  bool hasTranslation(String key) => _enableCache && _cache.containsKey(key);
 
   /// ✅ Get translation from cache
   String? getTranslation(String key) => _cache[key];
 
   /// ✅ Store translation in cache and save to file
   void saveTranslation(String key, String value) {
-    if (enableCache) {
+    if (_enableCache) {
       _cache[key] = value;
       _saveCache();
     }
@@ -50,9 +57,9 @@ class CacheManager {
 
   /// ✅ Clear cache file if caching is enabled
   void clearCache() {
-    if (enableCache) {
+    if (_enableCache) {
       _cache.clear();
-      File(cacheFilePath).deleteSync();
+      File(_cacheFilePath).deleteSync();
     }
   }
 }
