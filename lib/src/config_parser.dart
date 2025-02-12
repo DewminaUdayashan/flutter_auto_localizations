@@ -13,7 +13,7 @@ class ConfigParser {
     }
 
     final content = File(yamlConfigPath).readAsStringSync();
-    Map<String, dynamic> config = json
+    final config = json
         .decode(json.encode(loadYaml(content))); // Convert YAML to JSON format
 
     // Extract localization directory from `arb-dir` key
@@ -33,31 +33,34 @@ class ConfigParser {
           "❌ Invalid template-arb-file format: $templateArbFile. Expected format: app_<lang>.arb");
     }
 
-    // Load global ignore phrases
-    List<String> globalIgnorePhrases =
-        config.containsKey('global_ignore_phrases')
-            ? List<String>.from(config['global_ignore_phrases'])
-            : <String>[];
+    // ✅ Handle missing `global_ignore_phrases`
+    final globalIgnorePhrases = config.containsKey('global_ignore_phrases') &&
+            config['global_ignore_phrases'] is List
+        ? List<String>.from(config['global_ignore_phrases'])
+        : <String>[];
 
-    // Load key-specific ignore configurations
-    Map<String, dynamic> keyConfig = config.containsKey('key_config') &&
-            config['key_config'] is Map<String, dynamic>
-        ? Map<String, dynamic>.from(config['key_config'])
-        : <String, dynamic>{};
+    // ✅ Handle `key_config` ensuring it contains valid structures
+    final keyConfig =
+        config.containsKey('key_config') && config['key_config'] is Map
+            ? Map<String, dynamic>.from(config['key_config'])
+            : <String, dynamic>{};
 
-    // Ensure structure of key_config is correct
+    // Ensure structure of `key_config` is correct
     keyConfig.forEach((key, value) {
       if (value is Map<String, dynamic>) {
-        // Ensure `key_ignore_phrases` is a list
-        if (value.containsKey('key_ignore_phrases') &&
-            value['key_ignore_phrases'] is List) {
+        // ✅ Ensure `key_ignore_phrases` is a list, default to empty list if missing
+        if (!value.containsKey('key_ignore_phrases') ||
+            value['key_ignore_phrases'] == null) {
+          value['key_ignore_phrases'] = <String>[];
+        } else if (value['key_ignore_phrases'] is List) {
           value['key_ignore_phrases'] =
               List<String>.from(value['key_ignore_phrases']);
         } else {
-          value['key_ignore_phrases'] = <String>[];
+          throw Exception(
+              "❌ Invalid format for key_ignore_phrases under '$key'. Expected a list.");
         }
 
-        // Ensure `skipGlobalIgnore` and `skipKeyIgnore` are booleans
+        // ✅ Ensure `skipGlobalIgnore` and `skipKeyIgnore` are booleans, default to false if missing
         value['skipGlobalIgnore'] = value.containsKey('skipGlobalIgnore')
             ? value['skipGlobalIgnore'] == true
             : false;
