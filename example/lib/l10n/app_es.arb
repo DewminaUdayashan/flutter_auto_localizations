@@ -1,0 +1,57 @@
+{
+  "@@locale": "es",
+  "title": "Ejemplo de localización",
+  "welcomeMessage": "¡Hola, {username}!",
+  "@welcomeMessage": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "cartItems": "{count, plural, zero{Tu carrito esta vacío} one{Tienes uno item} other{Tienes {count} item}}",
+  "@cartItems": {
+    "description": "Pluralized cart message",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "followersCount": "{count, plural, one{Tienes 1 seguidor} other{Tienes {count} seguidores}}",
+  "@followersCount": {
+    "description": "Pluralized followers count",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "genderSelection": "{gender, select, male{He selected this} female{She selected this} other{They selected this}}",
+  "@genderSelection": {
+    "description": "Select message based on gender",
+    "placeholders": {
+      "gender": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationCount": "{count, plural, =0{Sin notificaciones} =1{1 notificación} other{Tienes {count} notificaciones}}",
+  "@notificationCount": {
+    "description": "ICU Plural message with select",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "userRole": "{role, select, admin{Tienes privilegios de administrador} user{Eres un usuario habitual} other{Estás navegando como invitado}}",
+  "@userRole": {
+    "description": "Select message for user roles",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  }
+}

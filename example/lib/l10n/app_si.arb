@@ -1,0 +1,57 @@
+{
+  "@@locale": "si",
+  "title": "දේශීයකරණ උදාහරණය",
+  "welcomeMessage": "හෙලෝ, {username}!",
+  "@welcomeMessage": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "cartItems": "{count, plural, zero{ඔබේ කරත්තය හිස්.} one{ඔබට එකක් තිබේ item} other{ඔබට {count} item ක් ඇත}}",
+  "@cartItems": {
+    "description": "Pluralized cart message",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "followersCount": "{count, plural, one{ඔබට අනුගාමිකයින් 1ක් සිටී.} other{ඔබට {count} අනුගාමිකයින් සිටී}}",
+  "@followersCount": {
+    "description": "Pluralized followers count",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "genderSelection": "{gender, select, male{He selected this} female{She selected this} other{They selected this}}",
+  "@genderSelection": {
+    "description": "Select message based on gender",
+    "placeholders": {
+      "gender": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationCount": "{count, plural, =0{දැනුම්දීම් නැත} =1{1 දැනුම්දීමක්} other{ඔබට {count} දැනුම්දීම් තිබේ.}}",
+  "@notificationCount": {
+    "description": "ICU Plural message with select",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "userRole": "{role, select, admin{ඔබට පරිපාලක වරප්‍රසාද තිබේ.} user{ඔබ සාමාන්‍ය පරිශීලකයෙකි.} other{ඔබ අමුත්තෙකු ලෙස බ්‍රවුස් කරමින් සිටී.}}",
+  "@userRole": {
+    "description": "Select message for user roles",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  }
+}

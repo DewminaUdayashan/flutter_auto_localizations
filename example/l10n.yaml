@@ -1,0 +1,22 @@
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+enable-cache: true
+
+languages:
+  - si
+  - es
+
+global-ignore-phrases:
+  - "Flutter"
+  - "Dart"
+
+key-config:
+  cartItems:
+    key-ignore-phrases:
+      - "item"
+      - "items"
+  notificationCount:
+    no-cache: true
+  genderSelection:
+    ignore: true
