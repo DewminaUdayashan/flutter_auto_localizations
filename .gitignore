@@ -1,5 +1,2 @@
-.dart_tool/
 .cache/
 .cache/translation_cache.json
-/coverage
-coverage/lcov.info
