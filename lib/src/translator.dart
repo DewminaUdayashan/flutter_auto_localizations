@@ -1,26 +1,26 @@
 import 'dart:convert';
 
+import 'package:flutter_auto_localizations/src/shared/utils.dart';
 import 'package:http/http.dart' as http;
 
 import 'cache_manager.dart';
 
 class Translator {
   final String apiKey;
-  final List<String> globalIgnorePhrases;
-  final Map<String, dynamic> keyConfig;
-  final bool enableCache;
   final http.Client httpClient; // ✅ Inject HTTP client for testing
   final CacheManager cacheManager; // ✅ Inject CacheManager for testing
 
   Translator(
     this.apiKey, {
-    this.globalIgnorePhrases = const [],
-    this.keyConfig = const {},
-    this.enableCache = true,
     CacheManager? cacheManager,
     http.Client? httpClient, // Optional, allows injection
   })  : httpClient = httpClient ?? http.Client(),
-        cacheManager = cacheManager ?? CacheManager(enableCache: enableCache);
+        cacheManager = cacheManager ??
+            CacheManager(
+              enableCache: TranslationConfig.instance.enableCache,
+            );
+
+  final config = TranslationConfig.instance; // Access shared config
 
   Future<String> translateText(
     String key,
@@ -30,13 +30,18 @@ class Translator {
   ) async {
     if (text.isEmpty) return text;
 
-    final perKeyConfig = keyConfig[key] ?? {};
+    final perKeyConfig = config.keyConfig[key] ?? {};
     final bool isIgnored = perKeyConfig['ignore'] ?? false;
     final bool noCache = perKeyConfig['no-cache'] ?? false;
 
     if (isIgnored) return text; // ✅ Skip translation if `ignore` is true
 
-    final cacheKey = "$fromLang-$toLang-$text";
+    final cacheKey = TranslationUtils.generateCacheKey(
+      fromLang: fromLang,
+      toLang: toLang,
+      text: text,
+      key: key,
+    );
 
     // ✅ Check Cache First
     if (!noCache && cacheManager.hasTranslation(cacheKey)) {
@@ -155,6 +160,8 @@ class Translator {
 
   /// ✅ Retrieves ignore phrases for a given key (Merges global + per-key)
   List<String> _getIgnorePhrasesForKey(String key) {
+    final keyConfig = config.keyConfig;
+
     final perKeyIgnorePhrases = keyConfig.containsKey(key) &&
             keyConfig[key]['key-ignore-phrases'] is List
         ? List<String>.from(keyConfig[key]['key-ignore-phrases'])
@@ -163,7 +170,7 @@ class Translator {
     return keyConfig.containsKey(key) &&
             keyConfig[key]['skip-global-ignore'] == true
         ? perKeyIgnorePhrases
-        : [...globalIgnorePhrases, ...perKeyIgnorePhrases];
+        : [...config.globalIgnorePhrases, ...perKeyIgnorePhrases];
   }
 
   /// ✅ Replaces ignore phrases with placeholders before translation

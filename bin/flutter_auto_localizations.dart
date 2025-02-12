@@ -2,25 +2,19 @@ import 'dart:io';
 
 import 'package:dotenv/dotenv.dart';
 import 'package:flutter_auto_localizations/flutter_auto_localizations.dart';
+import 'package:flutter_auto_localizations/src/shared/translation_config.dart';
 
 void main() async {
   try {
-    final env = DotEnv(includePlatformEnvironment: true)..load();
-    final config = ConfigParser.loadConfig();
+    // ✅ Initialize configuration
+    final config = await _initializeTranslationConfig();
 
-    // Extract dynamic localization settings
-    final localizationDir = config["localization-dir"];
-    final templateArbFile = config["template-arb-file"];
-    final defaultLang = config["default-lang"];
-
-    final targetLanguages = List<String>.from(config["languages"]);
-    final shouldRunPubGet =
-        config.containsKey("run-pub-get") ? config["run-pub-get"] : true;
-    final globalIgnorePhrases =
-        List<String>.from(config["global-ignore-phrases"]);
-    final keyConfig = Map<String, dynamic>.from(config["key-config"]);
-    final enableCache = config['enable-cache'] as bool;
-
+    final localizationDir = config["localizationDir"];
+    final templateArbFile = config["templateArbFile"];
+    final defaultLang = config["defaultLang"];
+    final targetLanguages = config["targetLanguages"];
+    final shouldRunPubGet = config["shouldRunPubGet"];
+    final apiKey = config["apiKey"];
     final arbFile = "$localizationDir/$templateArbFile";
     if (!File(arbFile).existsSync()) {
       print("❌ Error: Source ARB file not found: $arbFile");
@@ -28,8 +22,6 @@ void main() async {
     }
 
     final data = FileManager.readArbFile(arbFile);
-    final apiKey = env['GOOGLE_TRANSLATE_API_KEY'] ??
-        Platform.environment['GOOGLE_TRANSLATE_API_KEY'];
 
     if (apiKey == null) {
       print("❌ Missing GOOGLE_TRANSLATE_API_KEY environment variable.");
@@ -37,8 +29,7 @@ void main() async {
     }
 
     // ✅ Estimate translation cost before starting
-    final estimator = TranslationEstimator(
-        isCachingEnabled: enableCache, keyConfig: keyConfig);
+    final estimator = TranslationEstimator();
     estimator.estimateTranslationCost(arbFile, targetLanguages);
 
     // ✅ Ask for confirmation before proceeding
@@ -50,12 +41,7 @@ void main() async {
       exit(0);
     }
 
-    final translator = Translator(
-      apiKey,
-      globalIgnorePhrases: globalIgnorePhrases,
-      keyConfig: keyConfig,
-      enableCache: enableCache,
-    );
+    final translator = Translator(apiKey);
 
     for (final lang in targetLanguages) {
       print("\n🌍 Translating to $lang...");
@@ -91,4 +77,43 @@ void main() async {
   } catch (e) {
     print("❌ Error: $e");
   }
+}
+
+Future<Map<String, dynamic>> _initializeTranslationConfig() async {
+  final env = DotEnv(includePlatformEnvironment: true)..load();
+  final config = ConfigParser.loadConfig();
+
+  final localizationDir = config["localization-dir"];
+  final templateArbFile = config["template-arb-file"];
+  final defaultLang = config["default-lang"];
+  final targetLanguages = List<String>.from(config["languages"]);
+  final shouldRunPubGet =
+      config.containsKey("run-pub-get") ? config["run-pub-get"] : true;
+  final globalIgnorePhrases =
+      List<String>.from(config["global-ignore-phrases"]);
+  final keyConfig = Map<String, dynamic>.from(config["key-config"]);
+  final enableCache = config['enable-cache'] as bool;
+
+  // ✅ Explicitly initialize TranslationConfig
+  TranslationConfig.initialize(
+    keyConfig: keyConfig,
+    globalIgnorePhrases: globalIgnorePhrases,
+    enableCache: enableCache,
+  );
+
+  final apiKey = env['GOOGLE_TRANSLATE_API_KEY'] ??
+      Platform.environment['GOOGLE_TRANSLATE_API_KEY'];
+
+  if (apiKey == null) {
+    throw Exception("❌ Missing GOOGLE_TRANSLATE_API_KEY environment variable.");
+  }
+
+  return {
+    "localizationDir": localizationDir,
+    "templateArbFile": templateArbFile,
+    "defaultLang": defaultLang,
+    "targetLanguages": targetLanguages,
+    "shouldRunPubGet": shouldRunPubGet,
+    "apiKey": apiKey,
+  };
 }

@@ -1,23 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_auto_localizations/src/shared/utils.dart';
+
 import 'cache_manager.dart';
 
 class TranslationEstimator {
   TranslationEstimator({
-    required this.isCachingEnabled,
-    required this.keyConfig,
     CacheManager? cacheManager,
-  }) : cacheManager =
-            cacheManager ?? CacheManager(enableCache: isCachingEnabled);
+  }) : cacheManager = cacheManager ??
+            CacheManager(enableCache: TranslationConfig.instance.enableCache);
 
   final CacheManager cacheManager;
-  final bool isCachingEnabled;
-  final Map<String, dynamic> keyConfig;
 
-  static const int freeTierLimit =
-      500000; // Free for first 500K characters (per month)
-  static const double pricePerMillion = 20.00; // $20 per million characters
+  static const int freeTierLimit = 500000;
+  static const double pricePerMillion = 20.00;
   static const String pricingUrl =
       "https://cloud.google.com/translate/pricing#basic-pricing";
 
@@ -29,27 +26,32 @@ class TranslationEstimator {
       return;
     }
 
+    final config = TranslationConfig.instance; // Access shared configuration
     final Map<String, dynamic> arbData = jsonDecode(file.readAsStringSync());
-    final String sourceLang =
-        arbData["@@locale"] ?? "en"; // Default source language
+    final String sourceLang = arbData["@@locale"] ?? "en";
     int totalCharacters = 0;
     int cachedCharacters = 0;
 
     arbData.forEach((key, value) {
       if (!key.startsWith("@") && value is String) {
-        final perKeyConfig = keyConfig[key] ?? {};
+        final perKeyConfig = config.keyConfig[key] ?? {};
         final bool isIgnored = perKeyConfig['ignore'] ?? false;
         final bool noCache = perKeyConfig['no-cache'] ?? false;
 
-        if (isIgnored) return; // ✅ Skip translation if `ignore` is true
+        if (isIgnored) return;
 
         totalCharacters += value.length * targetLanguages.length;
 
         for (final targetLang in targetLanguages) {
-          final cacheKey = "$sourceLang-$targetLang-$value";
+          final cacheKey = TranslationUtils.generateCacheKey(
+            fromLang: sourceLang,
+            toLang: targetLang,
+            text: value,
+            key: key,
+          );
 
           if (!noCache &&
-              isCachingEnabled &&
+              config.enableCache &&
               cacheManager.hasTranslation(cacheKey)) {
             cachedCharacters += value.length;
           }
@@ -60,7 +62,6 @@ class TranslationEstimator {
     final remainingCharacters = totalCharacters - cachedCharacters;
     final estimatedCost = (remainingCharacters / 1000000) * pricePerMillion;
 
-    // 📊 Display Output
     print("\n📊 Translation Character Estimate:");
     print("-----------------------------------");
     print("🌍 Source ARB File: $arbFilePath");
