@@ -81,8 +81,8 @@ After configuring l10n.yaml, create the localization directory and the default A
 {
   "title": "Welcome to My App",
   "welcomeMessage": "Hello, {username}!",
-  "cart_items": "{count, plural, zero{Your cart is empty} one{You have one item} other{You have {count} items}}",
-  "@cart_items": {
+  "cartItems": "{count, plural, zero{Your cart is empty} one{You have one item} other{You have {count} items}}",
+  "@cartItems": {
     "description": "Pluralized message for cart items."
   }
 }
@@ -238,7 +238,7 @@ If Technology is in global_ignore_phrases, then:
 
 Defines  **per-key translation behavior**  by allowing you to  **override global settings**  or specify custom ignore phrases for individual translation keys.
 
-To customize translations for a specific key,  **use the key name from your ARB file**  and define configurations under  key_config.
+To customize translations for a specific key,  **use the key name from your ARB file**  and define configurations under  key-config.
 
 ##### 📌 How it works
 
