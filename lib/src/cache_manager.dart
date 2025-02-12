@@ -5,12 +5,14 @@ class CacheManager {
   static final CacheManager _instance = CacheManager._internal();
 
   factory CacheManager({
-    String cacheFilePath = 'translation_cache.json',
+    String cacheFilePath = '.cache/translation_cache.json', // ✅ Updated path
     bool enableCache = true,
   }) {
     _instance._cacheFilePath = cacheFilePath;
     _instance._enableCache = enableCache;
+    _instance._ensureCacheDirectoryExists(); // ✅ Ensure the directory exists
     if (enableCache) _instance._loadCache();
+    _instance._addToGitIgnore(); // ✅ Auto-add to .gitignore
     return _instance;
   }
 
@@ -19,6 +21,29 @@ class CacheManager {
   late String _cacheFilePath;
   late bool _enableCache;
   final Map<String, String> _cache = {};
+
+  /// ✅ Ensure the `.cache/` directory exists
+  void _ensureCacheDirectoryExists() {
+    final directory = Directory('.cache');
+    if (!directory.existsSync()) {
+      directory.createSync(recursive: true);
+    }
+  }
+
+  /// ✅ Auto-add cache file to `.gitignore` if not already ignored
+  void _addToGitIgnore() {
+    const gitIgnoreFile = '.gitignore';
+    final cacheEntry = '.cache/translation_cache.json';
+
+    final gitIgnore = File(gitIgnoreFile);
+    if (gitIgnore.existsSync()) {
+      final lines = gitIgnore.readAsLinesSync();
+      if (!lines.contains(cacheEntry)) {
+        gitIgnore.writeAsStringSync('\n$cacheEntry', mode: FileMode.append);
+        print("✅ Added `$cacheEntry` to `.gitignore`.");
+      }
+    }
+  }
 
   /// ✅ Load existing translations only if caching is enabled
   void _loadCache() {
