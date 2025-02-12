@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_auto_localizations/flutter_auto_localizations.dart';
+import 'package:flutter_auto_localizations/src/file_manager.dart';
 import 'package:test/test.dart';
 
 void main() {

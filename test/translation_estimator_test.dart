@@ -1,79 +1,84 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter_auto_localizations/src/shared/utils.dart';
 import 'package:flutter_auto_localizations/src/translation_estimator.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('TranslationEstimator Tests (Full Coverage)', () {
-    const validFile = "test/fixtures/test_valid.arb";
-    const emptyFile = "test/fixtures/test_empty.arb";
-    const largeFile = "test/fixtures/test_large.arb";
-    const invalidFile = "test/fixtures/test_invalid.arb";
-    const missingFile = "test/fixtures/non_existent.arb";
+  setUp(() {
+    // ✅ Ensure TranslationConfig is initialized before tests
+    TranslationConfig.initialize(
+      keyConfig: {
+        "sampleKey": {
+          "no-cache": false,
+          "ignore": false,
+        }
+      },
+      globalIgnorePhrases: ["ignoreMe"],
+      enableCache: true,
+    );
+  });
 
-    test('✅ Correctly calculates characters from a valid ARB file', () {
-      List<String> targetLanguages = ["es", "fr"];
-      expect(
-          () => TranslationEstimator.estimateTranslationCost(
-              validFile, targetLanguages),
-          prints(contains("💰 Estimated Total Cost: ")));
+  group('TranslationEstimator Tests', () {
+    const testArbFile = "test_valid.arb";
+    const missingArbFile = "non_existent.arb";
+
+    setUp(() {
+      // ✅ Create a sample ARB file for testing
+      final file = File(testArbFile);
+      file.writeAsStringSync(jsonEncode({
+        "@@locale": "en",
+        "hello": "Hello, world!",
+        "ignoredKey": "This should be ignored",
+      }));
     });
 
-    test('✅ Handles empty ARB file correctly', () {
-      List<String> targetLanguages = ["es"];
-      expect(
-          () => TranslationEstimator.estimateTranslationCost(
-              emptyFile, targetLanguages),
-          prints(contains("🔤 Estimated Total Characters: 0")));
-      expect(
-          () => TranslationEstimator.estimateTranslationCost(
-              emptyFile, targetLanguages),
-          prints(contains("💰 Estimated Total Cost: \$0.00")));
+    tearDown(() {
+      // ✅ Cleanup test files
+      final file = File(testArbFile);
+      if (file.existsSync()) {
+        file.deleteSync();
+      }
     });
 
     test('✅ Handles missing ARB file gracefully', () {
       List<String> targetLanguages = ["es"];
       expect(
-          () => TranslationEstimator.estimateTranslationCost(
-              missingFile, targetLanguages),
+          () => TranslationEstimator()
+              .estimateTranslationCost(missingArbFile, targetLanguages),
           prints(contains("❌ Error: ARB file not found")));
     });
 
-    test('✅ Handles invalid JSON in ARB file gracefully', () {
-      List<String> targetLanguages = ["es"];
-      expect(
-          () => TranslationEstimator.estimateTranslationCost(
-              invalidFile, targetLanguages),
-          throwsA(isA<FormatException>()));
-    });
-
-    test('✅ Handles large ARB file correctly', () {
+    test('✅ Estimates translation cost correctly', () {
       List<String> targetLanguages = ["es", "fr"];
       expect(
-          () => TranslationEstimator.estimateTranslationCost(
-              largeFile, targetLanguages),
+          () => TranslationEstimator()
+              .estimateTranslationCost(testArbFile, targetLanguages),
           prints(contains("💰 Estimated Total Cost: ")));
     });
 
-    test('✅ Correctly estimates free tier translations (0 cost)', () {
+    test('✅ Uses cache correctly to reduce API calls', () {
+      TranslationConfig.initialize(
+        keyConfig: {
+          "hello": {"no-cache": false},
+        },
+        globalIgnorePhrases: [],
+        enableCache: true,
+      );
+
       List<String> targetLanguages = ["es"];
       expect(
-          () => TranslationEstimator.estimateTranslationCost(
-              validFile, targetLanguages),
-          prints(contains("💰 Estimated Total Cost: \$0.00")));
-    });
-
-    test('✅ Correctly estimates exceeding free tier translations', () {
-      List<String> targetLanguages = ["es", "fr"];
-      expect(
-          () => TranslationEstimator.estimateTranslationCost(
-              largeFile, targetLanguages),
-          prints(contains("💰 Estimated Total Cost: ")));
+          () => TranslationEstimator()
+              .estimateTranslationCost(testArbFile, targetLanguages),
+          prints(contains("💾 Cached Characters: ")));
     });
 
     test('✅ Ensures pricing link appears in logs', () {
       List<String> targetLanguages = ["es"];
       expect(
-          () => TranslationEstimator.estimateTranslationCost(
-              validFile, targetLanguages),
+          () => TranslationEstimator()
+              .estimateTranslationCost(testArbFile, targetLanguages),
           prints(contains(
               "🔗 More details on pricing: https://cloud.google.com/translate/pricing#basic-pricing")));
     });

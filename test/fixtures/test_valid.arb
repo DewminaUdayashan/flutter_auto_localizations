@@ -1,4 +1,9 @@
 {
-    "simpleText": "Hello World",
-    "complexSentence": "This is a test sentence for estimation."
-}
+    "@@locale": "en",
+    "hello": "Hello, world!",
+    "ignoredKey": "This should be ignored",
+    "welcomeMessage": "Welcome to our app!",
+    "productDescription": "This is a high-quality product made with care.",
+    "icuPluralExample": "{count, plural, one {You have 1 item} other {You have # items}}",
+    "icuSelectExample": "{gender, select, male {He selected an option} female {She selected an option} other {They selected an option}}"
+  }
