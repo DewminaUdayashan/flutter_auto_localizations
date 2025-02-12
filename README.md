@@ -4,11 +4,17 @@ Effortlessly automate the localization process in your Flutter applications with
 ## ✨ Features
 
 ✅ Fully compatible with  **flutter_localizations**
+
 ✅  **Automatic parsing of ARB files**  and localization for specified languages
+
 ✅  **Generates localization delegates**  and localized string accessors
+
 ✅ **Supports ICU Plural and Select messages** for advanced translations
+
 ✅ **Customizable configurations** via l10n.yaml
+
 ✅  **Seamless integration**  with existing Flutter projects
+
 ✅  **Estimates API costs**  for translation requests
 
 ## 📦 Installation
@@ -88,9 +94,9 @@ To enable automatic translations, follow these steps:
 
 #### 🔑 Create an API Key & Configure Google Cloud Console
 
-•  Create an API key from  [**Google Cloud Console**](https://console.cloud.google.com/).
-•  Enable  [**Cloud Translation API**](https://cloud.google.com/translate).
-•  Billing must be enabled to use this API.
+- Create an API key from  [**Google Cloud Console**](https://console.cloud.google.com/).
+- Enable  [**Cloud Translation API**](https://cloud.google.com/translate).
+- Billing must be enabled to use this API.
 
 >💡 Google offers free translations for the first 500,000 characters per month (equivalent to $10 free credit monthly). After 500,000 characters, the cost is $20 per million characters.
 
@@ -98,8 +104,8 @@ To enable automatic translations, follow these steps:
 
 ### 3. Store API Key Securely**
 
-•  Create a  **.env**  file in your project’s root directory.
-•  Add your API key like this:
+- Create a  **.env**  file in your project’s root directory.
+- Add your API key like this:
 
 ```
 GOOGLE_TRANSLATE_API_KEY=<put_your_api_key>
@@ -165,8 +171,8 @@ Below is a detailed explanation of all possible configurations in the  l10n.yaml
 enable-cache: true
 ```
 
-Enables caching to **reduce API calls** and **optimize translations**.
-Set to false to **always fetch fresh translations**.
+- Enables caching to **reduce API calls** and **optimize translations**.
+- Set to false to **always fetch fresh translations**.
 
 #### 🔹 arb-dir
 
@@ -174,7 +180,7 @@ Set to false to **always fetch fresh translations**.
 arb-dir: lib/l10n
 ```
 
-Defines the  **directory**  where  .arb  (Application Resource Bundle) files are stored.
+- Defines the  **directory**  where  .arb  (Application Resource Bundle) files are stored.
 
 #### 🔹 template-arb-file
 
@@ -182,9 +188,9 @@ Defines the  **directory**  where  .arb  (Application Resource Bundle) files are
 template-arb-file: app_en.arb
 ```
 
-Specifies the  **base ARB file**  used as a reference for translations.
-📌 **Must be located inside the arb-dir directory.**
-📌 The  **default language**  is inferred from this filename (app_en.arb  →  en).
+- Specifies the  **base ARB file**  used as a reference for translations.
+- **Must be located inside the arb-dir directory.**
+- The  **default language**  is inferred from this filename (app_en.arb  →  en).
 
 #### 🔹 output-localization-file
 
@@ -192,7 +198,7 @@ Specifies the  **base ARB file**  used as a reference for translations.
 output-localization-file: app_localizations.dart
 ```
 
-Defines the  **Dart file**  where the localization implementation will be generated.
+- Defines the  **Dart file**  where the localization implementation will be generated.
 
 #### 🔹 languages
 
@@ -203,13 +209,9 @@ languages:
   - fr
 ```
 
-A list of  **languages**  to be generated from the template ARB file.
-📌 ARB file will be generated to each specified language.
-📌  **Supported languages:**  See  [Google Cloud Translate Docs](https://cloud.google.com/translate/docs/languages)
-
-### 🚀 Ignore Phrase Configurations
-
-These settings help **control how translations handle specific words and phrases**.
+- A list of  **languages**  to be generated from the template ARB file.
+- ARB file will be generated to each specified language.
+- **Supported languages:**  See  [Google Cloud Translate Docs](https://cloud.google.com/translate/docs/languages)
 
 #### 🔹 global-ignore-phrases
 
@@ -219,16 +221,16 @@ global-ignore-phrases:
   - "Notebook"
   - "Settings"
 ```
-
-•  Defines **words/phrases that should never be translated**, **across all keys**.
-•  Useful for **brand names, technical terms, or proper nouns**.
-•  These phrases will **always remain in their original language**.
+- These settings help **control how translations handle specific words and phrases**.
+- Defines **words/phrases that should never be translated**, **across all keys**.
+- Useful for **brand names, technical terms, or proper nouns**.
+- These phrases will **always remain in their original language** and **case sensitive**.
 
 ##### 📌 Example
 
 If Technology is in global_ignore_phrases, then:
-• **English:**  "Latest Technology"
-• **Spanish Translation:**  "Última Technology" (**Technology remains unchanged!**)
+- **English:**  "Latest Technology"
+- **Spanish Translation:**  "Última Technology" (**Technology remains unchanged!**)
 
 ### 📍 Key Level Configuration
 
@@ -240,9 +242,9 @@ To customize translations for a specific key,  **use the key name from your ARB 
 
 ##### 📌 How it works
 
-•  Each  **key in your ARB file**  can have its own configuration.
-•  Use  **skip-global-ignore**  to bypass the global ignore list.
-•  Use  **key-ignore-phrases**  to specify words that should not be translated for that key.
+- Each  **key in your ARB file**  can have its own configuration.
+- Use  **skip-global-ignore**  to bypass the global ignore list.
+- Use  **key-ignore-phrases**  to specify words that should not be translated for that key.
 
 ##### 📌 Example ARB File (app_en.arb)
 
@@ -258,7 +260,7 @@ To customize translations for a specific key,  **use the key name from your ARB 
 ```yaml
 key-config:
   productDescription:
-    skipGlobalIgnore: true
+    skip-global-ignore: true
 
   specialOffer:
     key-ignore-phrases:
@@ -274,14 +276,14 @@ key-config:
     skip-global-ignore: true
 ```
 
-•  **skip-global-ignore: true** forces **everything** in productDescription to be translated without considering global-ignore-phrases.
-•  Useful when **some keys need full translations** without restrictions.
+- **skip-global-ignore: true** forces **everything** in productDescription to be translated without considering global-ignore-phrases.
+- Useful when **some keys need full translations** without restrictions.
 
 ##### 📌 Example Behavior
 
-•  Suppose "service" is in global_ignore_phrases.
-•  Normally, it would not be translated.
-•  But **for productDescription, it will be translated** because skipGlobalIgnore: true.
+- Suppose "service" is in global_ignore_phrases.
+- Normally, it would not be translated.
+- But **for productDescription, it will be translated** because `skip-global-ignore: true`.
 
 #### 🔹 key-ignore-phrases
 
@@ -293,14 +295,14 @@ key-config:
       - "deal"
 ```
 
-• Unlike  **global_ignore_phrases**, this only affects  **one key**.
-• "exclusive" and "deal"  **will not be translated**, but **everything else will**.
+- Unlike  **global-ignore-phrases**, this only affects  **one key**.
+- "exclusive" and "deal"  **will not be translated**, but **everything else will**.
 
 ##### 📌 Example Behavior
 
-• **English:**  "This exclusive deal is available for a limited time!"
-• **Spanish Translation:**  "¡Esta exclusive deal está disponible por un tiempo limitado!"
-•  "exclusive"  and  "deal"  remain in English.
+- **English:**  "This exclusive deal is available for a limited time!"
+- **Spanish Translation:**  "¡Esta exclusive deal está disponible por un tiempo limitado!"
+("exclusive"  and  "deal"  remain in English.)
 
 #### 🔹 no-cache
 
@@ -310,7 +312,7 @@ key-config:
     no-cache: true
 ```
 
-• The specific key will not use the cached translations, but always use the API for translation.
+- The specific key will not use the cached translations, but always use the API for translation.
 
 #### 🔹 ignore
 
@@ -320,15 +322,15 @@ key-config:
     ignore: true
 ```
 
-• The specific key will be excluded from the translation.
+- The specific key will be excluded from the translation.
 
 
 ### 📌 Key Differences Between Global and Key-Level Ignores
 
-|**Feature**|global_ignore_phrases  | key_ignore_phrases |
+|**Feature**|global-ignore-phrases  | key-ignore-phrases |
 |--|--|--|
 | **Affects all keys** | ✅ Yes | ❌ No (only one key) |
-| **Can be bypassed?** | ✅ Yes (skipGlobalIgnore: true) | ❌ No |
+| **Can be bypassed?** | ✅ Yes (skip-global-ignore: true) | ❌ No |
 | **Good for** | Brand names, technical terms | Case-by-case exceptions|
 
 ## 📌 Example Full l10n.yaml Configuration
@@ -344,16 +346,16 @@ languages:
   - es
   - fr
 
-global_ignore_phrases:
+global-ignore-phrases:
   - "Flutter"
   - "Dart"
-  - "Google"
+  - "Running Man"
 
 key_config:
   productDescription:
-    skipGlobalIgnore: true
+    skip-global-ignore: true
   specialCase:
-    key_ignore_phrases:
+    key-ignore-phrases:
       - "exclusive"
       - "deal"
   cartItems:
@@ -364,9 +366,11 @@ key_config:
 
 ### 📌 This setup ensures
 
-•  "Flutter",  "Dart", and  "Google"  will  **never**  be translated.
-• "exclusive" and "deal" will be **ignored only in specialCase**.
-• productDescription  **will translate everything**, even globally igno
+- "Flutter",  "Dart", and  "Running Man"  will  **never**  be translated.
+- "exclusive" and "deal" will be **ignored only in specialCase**.
+- productDescription  **will translate everything**, not considering `global-ignore-phrases`.
+- `cartItems` will not be translated.
+- `cartEmptyState` will be translated, however it will not consider cached translations.
 
 ## 💡 Contributing
 
