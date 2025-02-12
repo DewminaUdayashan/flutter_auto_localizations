@@ -55,6 +55,7 @@ Create a  **l10n.yaml**  file in the root of your project and define your locali
 arb-dir: lib/l10n
 template-arb-file: app_en.arb
 output-localization-file: app_localizations.dart
+enable-cache: true # Enables caching for optimized translations
 
 languages:
   - si
@@ -156,7 +157,18 @@ class HomePage extends StatelessWidget {
 
 Below is a detailed explanation of all possible configurations in the  l10n.yaml  file.
 
-#### 🔹 arb-dir (Localization Directory)
+### 🌐 Global Configuration
+
+#### 🔹 enable-cache
+
+```yaml
+enable-cache: true
+```
+
+Enables caching to **reduce API calls** and **optimize translations**.
+Set to false to **always fetch fresh translations**.
+
+#### 🔹 arb-dir
 
 ```yaml
 arb-dir: lib/l10n
@@ -164,7 +176,7 @@ arb-dir: lib/l10n
 
 Defines the  **directory**  where  .arb  (Application Resource Bundle) files are stored.
 
-#### 🔹 template-arb-file (Default Language ARB File)
+#### 🔹 template-arb-file
 
 ```yaml
 template-arb-file: app_en.arb
@@ -174,7 +186,7 @@ Specifies the  **base ARB file**  used as a reference for translations.
 📌 **Must be located inside the arb-dir directory.**
 📌 The  **default language**  is inferred from this filename (app_en.arb  →  en).
 
-#### 🔹 output-localization-file (Generated File)
+#### 🔹 output-localization-file
 
 ```yaml
 output-localization-file: app_localizations.dart
@@ -182,7 +194,7 @@ output-localization-file: app_localizations.dart
 
 Defines the  **Dart file**  where the localization implementation will be generated.
 
-#### 🔹 languages (Target Translation Languages)
+#### 🔹 languages
 
 ```yaml
 languages:
@@ -199,10 +211,10 @@ A list of  **languages**  to be generated from the template ARB file.
 
 These settings help **control how translations handle specific words and phrases**.
 
-#### 🔹 global_ignore_phrases (Globally Ignored Phrases)
+#### 🔹 global-ignore-phrases
 
 ```yaml
-global_ignore_phrases:
+global-ignore-phrases:
   - "Technology"
   - "Notebook"
   - "Settings"
@@ -218,7 +230,9 @@ If Technology is in global_ignore_phrases, then:
 • **English:**  "Latest Technology"
 • **Spanish Translation:**  "Última Technology" (**Technology remains unchanged!**)
 
-#### 🔹 key_config (Per-Key Customization)
+### 📍 Key Level Configuration
+
+#### 🔹 key-config (Per-Key Customization)
 
 Defines  **per-key translation behavior**  by allowing you to  **override global settings**  or specify custom ignore phrases for individual translation keys.
 
@@ -227,8 +241,8 @@ To customize translations for a specific key,  **use the key name from your ARB 
 ##### 📌 How it works
 
 •  Each  **key in your ARB file**  can have its own configuration.
-•  Use  **skipGlobalIgnore**  to bypass the global ignore list.
-•  Use  **key_ignore_phrases**  to specify words that should not be translated for that key.
+•  Use  **skip-global-ignore**  to bypass the global ignore list.
+•  Use  **key-ignore-phrases**  to specify words that should not be translated for that key.
 
 ##### 📌 Example ARB File (app_en.arb)
 
@@ -242,27 +256,26 @@ To customize translations for a specific key,  **use the key name from your ARB 
 ##### 📌 Corresponding l10n.yaml Configuration
 
 ```yaml
-key_config:
+key-config:
   productDescription:
     skipGlobalIgnore: true
 
   specialOffer:
-    key_ignore_phrases:
+    key-ignore-phrases:
       - "exclusive"
       - "deal"
 ```
 
-#### 🔹 skipGlobalIgnore (Bypass Global Ignore List)
+#### 🔹 skip-global-ignore
 
 ```yaml
-key_config:
+key-config:
   productDescription:
-    skipGlobalIgnore: true
+    skip-global-ignore: true
 ```
 
-•  By default, words in  **global_ignore_phrases**  are not translated.
-•  **skipGlobalIgnore: true**  forces  **everything**  in  productDescription  to be translated.
-•  Useful when  **some keys need full translations**  without restrictions.
+•  **skip-global-ignore: true** forces **everything** in productDescription to be translated without considering global-ignore-phrases.
+•  Useful when **some keys need full translations** without restrictions.
 
 ##### 📌 Example Behavior
 
@@ -270,17 +283,17 @@ key_config:
 •  Normally, it would not be translated.
 •  But **for productDescription, it will be translated** because skipGlobalIgnore: true.
 
-#### 🔹 key_ignore_phrases (Per-Key Ignore List)
+#### 🔹 key-ignore-phrases
 
 ```yaml
-key_config:
+key-config:
   specialOffer:
-    key_ignore_phrases:
+    key-ignore-phrases:
       - "exclusive"
       - "deal"
 ```
 
-•  Unlike  **global_ignore_phrases**, this only affects  **one key**.
+• Unlike  **global_ignore_phrases**, this only affects  **one key**.
 • "exclusive" and "deal"  **will not be translated**, but **everything else will**.
 
 ##### 📌 Example Behavior
@@ -288,6 +301,27 @@ key_config:
 • **English:**  "This exclusive deal is available for a limited time!"
 • **Spanish Translation:**  "¡Esta exclusive deal está disponible por un tiempo limitado!"
 •  "exclusive"  and  "deal"  remain in English.
+
+#### 🔹 no-cache
+
+```yaml
+key-config:
+  specialOffer:
+    no-cache: true
+```
+
+• The specific key will not use the cached translations, but always use the API for translation.
+
+#### 🔹 ignore
+
+```yaml
+key-config:
+  specialOffer:
+    ignore: true
+```
+
+• The specific key will be excluded from the translation.
+
 
 ### 📌 Key Differences Between Global and Key-Level Ignores
 
@@ -303,6 +337,7 @@ key_config:
 arb-dir: lib/l10n
 template-arb-file: app_en.arb
 output-localization-file: app_localizations.dart
+enable-cache: true
 
 languages:
   - en
@@ -321,6 +356,10 @@ key_config:
     key_ignore_phrases:
       - "exclusive"
       - "deal"
+  cartItems:
+    ignore: true
+  cartEmptyState:
+    no-cache: true
 ```
 
 ### 📌 This setup ensures
