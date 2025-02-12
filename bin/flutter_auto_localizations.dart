@@ -19,6 +19,7 @@ void main() async {
     final globalIgnorePhrases =
         List<String>.from(config["global_ignore_phrases"]);
     final keyConfig = Map<String, dynamic>.from(config["key_config"]);
+    final enableCache = config['enable_cache'] as bool;
 
     final arbFile = "$localizationDir/$templateArbFile";
     if (!File(arbFile).existsSync()) {
@@ -36,7 +37,8 @@ void main() async {
     }
 
     // ✅ Estimate translation cost before starting
-    TranslationEstimator.estimateTranslationCost(arbFile, targetLanguages);
+    final estimator = TranslationEstimator(isCachingEnabled: enableCache);
+    estimator.estimateTranslationCost(arbFile, targetLanguages);
 
     // ✅ Ask for confirmation before proceeding
     stdout.write("\n🔄 Proceed with translation? (yes/no): ");
@@ -51,6 +53,7 @@ void main() async {
       apiKey,
       globalIgnorePhrases: globalIgnorePhrases,
       keyConfig: keyConfig,
+      enableCache: enableCache,
     );
 
     for (final lang in targetLanguages) {
