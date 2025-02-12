@@ -10,3 +10,6 @@
 - Added per-key configurations.
 - Provided cost estimation for translation API usage.
   
+## 1.0.1
+
+- Update README.md
