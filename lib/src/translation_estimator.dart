@@ -71,7 +71,7 @@ class TranslationEstimator {
     print("💾 Cached Characters: $cachedCharacters");
     print("⚡ API Call Needed for: $remainingCharacters characters");
     print("💰 Estimated Total Cost: \$${estimatedCost.toStringAsFixed(2)}");
-    print("ℹ️ Free Tier: First $freeTierLimit characters per month are free.");
+    print("ℹ️  Free Tier: First $freeTierLimit characters per month are free.");
     print("🔗 More details on pricing: $pricingUrl");
     print("🚧 Note: This is an estimate. Actual cost depends on API usage.");
     print("------------------------------------------------\n");
