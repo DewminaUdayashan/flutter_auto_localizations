@@ -383,7 +383,3 @@ If you find this package helpful and want to support its development, consider *
 [![Buy Me a Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/dewmina)  
 
 Your support helps keep the project updated and maintained. Thank you! ❤️
-
-## 📜 License
-
-This project is licensed under the  **MIT License**.
