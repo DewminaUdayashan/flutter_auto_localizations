@@ -30,58 +30,57 @@ class ConfigParser {
 
     if (defaultLang.isEmpty) {
       throw Exception(
-          "❌ Invalid template-arb-file format: $templateArbFile. Expected format: app_<lang>.arb");
+          "❌ Invalid template-arb-file format: $templateArbFile. Expected format: app-<lang>.arb");
     }
 
-    // ✅ Handle missing `global_ignore_phrases`
-    final globalIgnorePhrases = config.containsKey('global_ignore_phrases') &&
-            config['global_ignore_phrases'] is List
-        ? List<String>.from(config['global_ignore_phrases'])
+    // ✅ Handle missing `global-ignore-phrases`
+    final globalIgnorePhrases = config.containsKey('global-ignore-phrases') &&
+            config['global-ignore-phrases'] is List
+        ? List<String>.from(config['global-ignore-phrases'])
         : <String>[];
 
-    // ✅ Handle `key_config` ensuring it contains valid structures
+    // ✅ Handle `key-config` ensuring it contains valid structures
     final keyConfig =
-        config.containsKey('key_config') && config['key_config'] is Map
-            ? Map<String, dynamic>.from(config['key_config'])
+        config.containsKey('key-config') && config['key-config'] is Map
+            ? Map<String, dynamic>.from(config['key-config'])
             : <String, dynamic>{};
 
-    // Ensure structure of `key_config` is correct
+    // Ensure structure of `key-config` is correct
     keyConfig.forEach((key, value) {
       if (value is Map<String, dynamic>) {
-        // ✅ Ensure `key_ignore_phrases` is a list, default to empty list if missing
-        if (!value.containsKey('key_ignore_phrases') ||
-            value['key_ignore_phrases'] == null) {
-          value['key_ignore_phrases'] = <String>[];
-        } else if (value['key_ignore_phrases'] is List) {
-          value['key_ignore_phrases'] =
-              List<String>.from(value['key_ignore_phrases']);
-        } else {
-          throw Exception(
-              "❌ Invalid format for key_ignore_phrases under '$key'. Expected a list.");
-        }
+        value['key-ignore-phrases'] = value.containsKey('key-ignore-phrases') &&
+                value['key-ignore-phrases'] is List
+            ? List<String>.from(value['key-ignore-phrases'])
+            : <String>[];
 
-        // ✅ Ensure `skipGlobalIgnore` and `skipKeyIgnore` are booleans, default to false if missing
-        value['skipGlobalIgnore'] = value.containsKey('skipGlobalIgnore')
-            ? value['skipGlobalIgnore'] == true
+        value['skip-global-ignore'] = value.containsKey('skip-global-ignore')
+            ? value['skip-global-ignore'] == true
             : false;
-        value['skipKeyIgnore'] = value.containsKey('skipKeyIgnore')
-            ? value['skipKeyIgnore'] == true
+
+        value['skip-key-ignore'] = value.containsKey('skip-key-ignore')
+            ? value['skip-key-ignore'] == true
             : false;
+
+        // ✅ New: Handle `no-cache` & `ignore`
+        value['no-cache'] =
+            value.containsKey('no-cache') ? value['no-cache'] == true : false;
+        value['ignore'] =
+            value.containsKey('ignore') ? value['ignore'] == true : false;
       }
     });
 
     // Read cache setting, default to true if not specified
-    final enableCache = config.containsKey('enable_cache')
-        ? config['enable_cache'] == true
+    final enableCache = config.containsKey('enable-cache')
+        ? config['enable-cache'] == true
         : true;
 
     // Inject dynamically parsed values
-    config['localization_dir'] = localizationDir;
-    config['template_arb_file'] = templateArbFile;
-    config['default_lang'] = defaultLang;
-    config['global_ignore_phrases'] = globalIgnorePhrases;
-    config['key_config'] = keyConfig;
-    config['enable_cache'] = enableCache;
+    config['localization-dir'] = localizationDir;
+    config['template-arb-file'] = templateArbFile;
+    config['default-lang'] = defaultLang;
+    config['global-ignore-phrases'] = globalIgnorePhrases;
+    config['key-config'] = keyConfig;
+    config['enable-cache'] = enableCache;
 
     return config;
   }

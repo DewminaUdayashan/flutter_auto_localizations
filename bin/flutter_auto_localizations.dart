@@ -9,17 +9,17 @@ void main() async {
     final config = ConfigParser.loadConfig();
 
     // Extract dynamic localization settings
-    final localizationDir = config["localization_dir"];
-    final templateArbFile = config["template_arb_file"];
-    final defaultLang = config["default_lang"];
+    final localizationDir = config["localization-dir"];
+    final templateArbFile = config["template-arb-file"];
+    final defaultLang = config["default-lang"];
 
     final targetLanguages = List<String>.from(config["languages"]);
     final shouldRunPubGet =
-        config.containsKey("run_pub_get") ? config["run_pub_get"] : true;
+        config.containsKey("run-pub-get") ? config["run-pub-get"] : true;
     final globalIgnorePhrases =
-        List<String>.from(config["global_ignore_phrases"]);
-    final keyConfig = Map<String, dynamic>.from(config["key_config"]);
-    final enableCache = config['enable_cache'] as bool;
+        List<String>.from(config["global-ignore-phrases"]);
+    final keyConfig = Map<String, dynamic>.from(config["key-config"]);
+    final enableCache = config['enable-cache'] as bool;
 
     final arbFile = "$localizationDir/$templateArbFile";
     if (!File(arbFile).existsSync()) {
@@ -37,7 +37,8 @@ void main() async {
     }
 
     // ✅ Estimate translation cost before starting
-    final estimator = TranslationEstimator(isCachingEnabled: enableCache);
+    final estimator = TranslationEstimator(
+        isCachingEnabled: enableCache, keyConfig: keyConfig);
     estimator.estimateTranslationCost(arbFile, targetLanguages);
 
     // ✅ Ask for confirmation before proceeding
