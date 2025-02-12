@@ -1,13 +1,12 @@
 import 'dart:io';
 
-import 'package:flutter_auto_localizations/flutter_auto_localizations.dart';
+import 'package:flutter_auto_localizations/src/config_parser.dart';
 import 'package:test/test.dart';
 
 void main() {
   const configFileName = "l10n.yaml";
 
-  setUp(() async {
-    // Ensure the file is written before any test runs
+  setUp(() {
     final testConfigFile = File(configFileName);
     if (testConfigFile.existsSync()) {
       testConfigFile.deleteSync();
@@ -19,19 +18,16 @@ template-arb-file: app_en.arb
 languages:
   - fr
   - es
-global_ignore_phrases:
+global-ignore-phrases:
   - "test"
-key_config:
-  example_key:
-    skipGlobalIgnore: true
+key-config:
+  exampleKey:
+    skip-global-ignore: true
+enable-cache: true
 """);
-
-    // Ensure file system flush before reading
-    await Future.delayed(Duration(milliseconds: 100));
   });
 
   tearDown(() {
-    // Clean up after each test
     final testConfigFile = File(configFileName);
     if (testConfigFile.existsSync()) {
       testConfigFile.deleteSync();
@@ -43,22 +39,18 @@ key_config:
       final config = ConfigParser.loadConfig();
 
       expect(config, isNotEmpty);
-      expect(config["localization_dir"], equals("lib/l10n"));
-      expect(config["template_arb_file"], equals("app_en.arb"));
-      expect(config["default_lang"], equals("en"));
+      expect(config["localization-dir"], equals("lib/l10n"));
+      expect(config["template-arb-file"], equals("app_en.arb"));
+      expect(config["default-lang"], equals("en"));
       expect(config["languages"], containsAll(["fr", "es"]));
-      expect(config["global_ignore_phrases"], contains("test"));
-      expect(config["key_config"], contains("example_key"));
-      expect(config["key_config"]["example_key"]["skipGlobalIgnore"], isTrue);
+      expect(config["global-ignore-phrases"], contains("test"));
+      expect(config["key-config"], contains("exampleKey"));
+      expect(config["key-config"]["exampleKey"]["skip-global-ignore"], isTrue);
+      expect(config["enable-cache"], isTrue);
     });
 
     test('✅ Throws exception when l10n.yaml is missing', () {
-      // Delete file before testing missing case
-      final testConfigFile = File(configFileName);
-      if (testConfigFile.existsSync()) {
-        testConfigFile.deleteSync();
-      }
-
+      File(configFileName).deleteSync();
       expect(() => ConfigParser.loadConfig(), throwsA(isA<Exception>()));
     });
   });

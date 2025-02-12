@@ -67,13 +67,23 @@ class TranslationEstimator {
     print("🌍 Source ARB File: $arbFilePath");
     print("🔤 Source Language: $sourceLang");
     print("📌 Target Languages: ${targetLanguages.join(', ')}");
-    print("🔤 Total Characters (Before Cache): $totalCharacters");
-    print("💾 Cached Characters: $cachedCharacters");
-    print("⚡ API Call Needed for: $remainingCharacters characters");
+    print(
+        "🔤 Total Characters (Before Cache): ${formatNumber(totalCharacters)}");
+    print("💾 Cached Characters: ${formatNumber(totalCharacters)}");
+    print(
+        "⚡ API Call Needed for: ${formatNumber(remainingCharacters)} characters");
     print("💰 Estimated Total Cost: \$${estimatedCost.toStringAsFixed(2)}");
-    print("ℹ️  Free Tier: First $freeTierLimit characters per month are free.");
+    print(
+        "ℹ️  Free Tier: First ${formatNumber(remainingCharacters)} characters per month are free.");
     print("🔗 More details on pricing: $pricingUrl");
     print("🚧 Note: This is an estimate. Actual cost depends on API usage.");
     print("------------------------------------------------\n");
+  }
+
+  /// ✅ Formats numbers with commas for better readability
+  static String formatNumber(int number) {
+    return number
+        .toString()
+        .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => ",");
   }
 }
