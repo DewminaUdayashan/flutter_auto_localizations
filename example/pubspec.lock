@@ -84,7 +84,7 @@ packages:
       path: "/Users/dewminaudayashan/Documents/2025/flutter_auto_localizations"
       relative: false
     source: path
-    version: "0.0.1"
+    version: "1.0.0"
   flutter_lints:
     dependency: "direct dev"
     description:
