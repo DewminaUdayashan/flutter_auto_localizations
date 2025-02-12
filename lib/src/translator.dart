@@ -30,10 +30,16 @@ class Translator {
   ) async {
     if (text.isEmpty) return text;
 
+    final perKeyConfig = keyConfig[key] ?? {};
+    final bool isIgnored = perKeyConfig['ignore'] ?? false;
+    final bool noCache = perKeyConfig['no-cache'] ?? false;
+
+    if (isIgnored) return text; // ✅ Skip translation if `ignore` is true
+
     final cacheKey = "$fromLang-$toLang-$text";
 
     // ✅ Check Cache First
-    if (cacheManager.hasTranslation(cacheKey)) {
+    if (!noCache && cacheManager.hasTranslation(cacheKey)) {
       return cacheManager.getTranslation(cacheKey)!;
     }
 
@@ -44,14 +50,18 @@ class Translator {
       translatedText =
           await _processICUMessage(key, text, fromLang, toLang, "plural");
       // ✅ Store in Cache
-      cacheManager.saveTranslation(cacheKey, translatedText);
+      if (!noCache) {
+        cacheManager.saveTranslation(cacheKey, translatedText);
+      }
       return translatedText;
     }
     if (_isICUSelect(text)) {
       translatedText =
           await _processICUMessage(key, text, fromLang, toLang, "select");
       // ✅ Store in Cache
-      cacheManager.saveTranslation(cacheKey, translatedText);
+      if (!noCache) {
+        cacheManager.saveTranslation(cacheKey, translatedText);
+      }
       return translatedText;
     }
 
@@ -67,8 +77,11 @@ class Translator {
 
     // ✅ Restore ignored phrases AFTER translation
     translatedText = _restorePlaceholders(translatedText, placeholderMap);
+
     // ✅ Store in Cache
-    cacheManager.saveTranslation(cacheKey, translatedText);
+    if (!noCache) {
+      cacheManager.saveTranslation(cacheKey, translatedText);
+    }
 
     return translatedText;
   }
@@ -143,12 +156,12 @@ class Translator {
   /// ✅ Retrieves ignore phrases for a given key (Merges global + per-key)
   List<String> _getIgnorePhrasesForKey(String key) {
     final perKeyIgnorePhrases = keyConfig.containsKey(key) &&
-            keyConfig[key]['key_ignore_phrases'] is List
-        ? List<String>.from(keyConfig[key]['key_ignore_phrases'])
+            keyConfig[key]['key-ignore-phrases'] is List
+        ? List<String>.from(keyConfig[key]['key-ignore-phrases'])
         : <String>[];
 
     return keyConfig.containsKey(key) &&
-            keyConfig[key]['skipGlobalIgnore'] == true
+            keyConfig[key]['skip-global-ignore'] == true
         ? perKeyIgnorePhrases
         : [...globalIgnorePhrases, ...perKeyIgnorePhrases];
   }
