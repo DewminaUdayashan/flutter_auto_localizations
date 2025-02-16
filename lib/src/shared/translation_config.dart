@@ -15,9 +15,6 @@
 /// print(config.keyConfig); // {'hello': 'Hola'}
 /// ```
 class TranslationConfig {
-  /// The singleton instance of [TranslationConfig].
-  static TranslationConfig? _instance;
-
   /// Private constructor for initializing the [TranslationConfig] singleton.
   ///
   /// Use [initialize] to create an instance before accessing [instance].
@@ -26,6 +23,9 @@ class TranslationConfig {
     required this.globalIgnorePhrases,
     required this.enableCache,
   });
+
+  /// The singleton instance of [TranslationConfig].
+  static TranslationConfig? _instance;
 
   /// Initializes the [TranslationConfig] singleton.
   ///

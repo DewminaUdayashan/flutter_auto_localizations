@@ -14,9 +14,6 @@ import 'dart:io';
 /// print(cacheManager.getTranslation("hello")); // Outputs: Hola
 /// ```
 class CacheManager {
-  /// The singleton instance of `CacheManager`.
-  static final CacheManager _instance = CacheManager._internal();
-
   /// Creates a new instance of `CacheManager` with optional parameters.
   ///
   /// - [cacheFilePath]: The file path where the cache is stored (default: `.cache/translation_cache.json`).
@@ -40,6 +37,9 @@ class CacheManager {
 
   /// Private constructor for the singleton pattern.
   CacheManager._internal();
+
+  /// The singleton instance of `CacheManager`.
+  static final CacheManager _instance = CacheManager._internal();
 
   /// The file path where translations are cached.
   late String _cacheFilePath;
