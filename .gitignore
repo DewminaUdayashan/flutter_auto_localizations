@@ -1,3 +1,4 @@
 .cache/
 .cache/translation_cache.json
 coverage/
+doc/

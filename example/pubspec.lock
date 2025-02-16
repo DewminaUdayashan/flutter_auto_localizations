@@ -81,10 +81,11 @@ packages:
   flutter_auto_localizations:
     dependency: "direct dev"
     description:
-      path: "/Users/dewminaudayashan/Documents/2025/flutter_auto_localizations"
-      relative: false
-    source: path
-    version: "1.0.0"
+      name: flutter_auto_localizations
+      sha256: f7f47a73f406a437e9c9c6203651ccc9d732983a0f1f30334b6e653db938a784
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   flutter_lints:
     dependency: "direct dev"
     description:
