@@ -1,4 +1,13 @@
-# Changelog
+## 1.0.2
+
+- Added `sort_constructors_first` lint rule in `analysis_options.yaml` to enforce better code structure.
+- Updated dart doc.
+- Declared platform support (`linux`, `macos`, `windows`) in `pubspec.yaml` to clarify that this package as a CLI tool.
+
+
+## 1.0.1
+
+- Update README.md
 
 ## 1.0.0
 
@@ -9,7 +18,3 @@
 - Added global configurations.
 - Added per-key configurations.
 - Provided cost estimation for translation API usage.
-  
-## 1.0.1
-
-- Update README.md
