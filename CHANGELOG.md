@@ -4,7 +4,6 @@
 - Updated dart doc.
 - Declared platform support (`linux`, `macos`, `windows`) in `pubspec.yaml` to clarify that this package as a CLI tool.
 
-
 ## 1.0.1
 
 - Update README.md
@@ -18,3 +17,4 @@
 - Added global configurations.
 - Added per-key configurations.
 - Provided cost estimation for translation API usage.
+  
