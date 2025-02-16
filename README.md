@@ -21,7 +21,7 @@ Effortlessly automate the localization process in your Flutter applications with
 
 ### 1. Enable Flutter Localizations
 
-Add the following to your  pubspec.yaml  under  **dependencies**  if not already present:
+Add the following to your  pubspec.yaml  under  **dev_dependencies**  if not already present:
 
 ```yaml
 dependencies:

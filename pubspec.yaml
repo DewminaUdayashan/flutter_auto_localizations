@@ -4,6 +4,10 @@ version: 1.0.1
 repository: https://github.com/DewminaUdayashan/flutter_auto_localizations
 executables:
   flutter_auto_localizations: flutter_auto_localizations
+platforms:
+  linux:
+  macos:
+  windows:
 
 environment:
   sdk: ">=2.17.0 <4.0.0"
