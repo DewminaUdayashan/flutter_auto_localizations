@@ -5,11 +5,23 @@ import 'package:http/http.dart' as http;
 
 import 'cache_manager.dart';
 
+/// A utility class for handling text translations using the Google Translate API.
+///
+/// The `Translator` class provides methods to translate text between languages,
+/// manage translation caching, and handle special cases like ICU messages and ignored phrases.
+///
+/// Example usage:
+/// ```dart
+/// final translator = Translator("YOUR_API_KEY");
+/// final translatedText = await translator.translateText("greeting", "Hello", "en", "es");
+/// print(translatedText); // Output: "Hola"
+/// ```
 class Translator {
-  final String apiKey;
-  final http.Client httpClient; // ✅ Inject HTTP client for testing
-  final CacheManager cacheManager; // ✅ Inject CacheManager for testing
-
+  /// Creates an instance of `Translator` with an API key.
+  ///
+  /// - [apiKey]: The API key for Google Translate.
+  /// - [cacheManager]: Optional, allows injecting a custom `CacheManager` instance.
+  /// - [httpClient]: Optional, allows injecting an HTTP client for testing.
   Translator(
     this.apiKey, {
     CacheManager? cacheManager,
@@ -20,8 +32,38 @@ class Translator {
               enableCache: TranslationConfig.instance.enableCache,
             );
 
+  /// The API key used for Google Translate API requests.
+  final String apiKey;
+
+  /// The HTTP client used for making API requests.
+  final http.Client httpClient;
+
+  /// The cache manager used for storing and retrieving translations.
+  final CacheManager cacheManager;
+
+  /// Shared translation configuration instance.
   final config = TranslationConfig.instance; // Access shared config
 
+  /// Translates a given text from [fromLang] to [toLang].
+  ///
+  /// - [key]: The translation key.
+  /// - [text]: The text to be translated.
+  /// - [fromLang]: The source language code.
+  /// - [toLang]: The target language code.
+  ///
+  /// This method:
+  /// - **Checks the cache** before making an API request.
+  /// - **Handles ICU messages** (`plural` and `select`).
+  /// - **Respects ignored phrases**.
+  /// - **Calls Google Translate API** if needed.
+  ///
+  /// Returns the translated text.
+  ///
+  /// Example:
+  /// ```dart
+  /// final translation = await translator.translateText("greeting", "Hello", "en", "es");
+  /// print(translation); // Output: "Hola"
+  /// ```
   Future<String> translateText(
     String key,
     String text,

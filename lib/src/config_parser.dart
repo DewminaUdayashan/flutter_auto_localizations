@@ -3,7 +3,34 @@ import 'dart:io';
 
 import 'package:yaml/yaml.dart';
 
+/// A utility class for parsing and loading Flutter localization configurations.
+///
+/// The `ConfigParser` reads settings from a `l10n.yaml` file, which is commonly used
+/// in Flutter projects for localization setup. It extracts essential configurations
+/// such as the ARB directory, template ARB file, default language, and other custom settings.
+///
+/// Example usage:
+/// ```dart
+/// final config = ConfigParser.loadConfig();
+/// print(config['localization-dir']); // Output: "lib/l10n"
+/// ```
 class ConfigParser {
+  /// Loads and parses the `l10n.yaml` configuration file.
+  ///
+  /// This method reads the YAML configuration file, converts it into a JSON-compatible
+  /// `Map<String, dynamic>`, and extracts the following properties:
+  ///
+  /// - `arb-dir`: Directory containing ARB files (default: `"lib/l10n"`).
+  /// - `template-arb-file`: The main ARB template file (default: `"app_en.arb"`).
+  /// - `default-lang`: The default language extracted from the template filename.
+  /// - `global-ignore-phrases`: A list of phrases to ignore globally.
+  /// - `key-config`: Configuration for individual translation keys.
+  /// - `enable-cache`: Whether caching is enabled (default: `true`).
+  ///
+  /// Throws an [Exception] if the configuration file does not exist or if
+  /// `template-arb-file` has an invalid format.
+  ///
+  /// Returns a `Map<String, dynamic>` containing parsed configuration values.
   static Map<String, dynamic> loadConfig() {
     const yamlConfigPath =
         "l10n.yaml"; // Standard Flutter localization config file
@@ -39,7 +66,7 @@ class ConfigParser {
         ? List<String>.from(config['global-ignore-phrases'])
         : <String>[];
 
-    // ✅ Handle `key-config` ensuring it contains valid structures
+    // ✅ Handle `key-config`, ensuring it contains valid structures
     final keyConfig =
         config.containsKey('key-config') && config['key-config'] is Map
             ? Map<String, dynamic>.from(config['key-config'])
@@ -61,7 +88,7 @@ class ConfigParser {
             ? value['skip-key-ignore'] == true
             : false;
 
-        // ✅ New: Handle `no-cache` & `ignore`
+        // ✅ Handle `no-cache` & `ignore`
         value['no-cache'] =
             value.containsKey('no-cache') ? value['no-cache'] == true : false;
         value['ignore'] =
